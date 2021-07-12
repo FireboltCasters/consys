@@ -1,0 +1,61 @@
+{
+  "name": "consys",
+  "version": "0.0.1",
+  "description": "consys",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "coverage": "jest --coverage",
+    "test": "pwd && npm run build && npm run testOnly",
+    "testOnly": "npm run coverage",
+    "start": "npm run build && node ./build/ignoreCoverage/development.js",
+    "_prepareBuild": "rm -rf ./build",
+    "build": "npm run _prepareBuild && rimraf ./build && tsc && cp package.json ./build && cp README.md ./build",
+    "dev": "nodemon",
+    "_prepareUpload": "npm run build && rm -rf ./coverage && rm -rf ./build/tests",
+    "_uploadBuild": "cd ./build && npm pack && npm publish && cd ..",
+    "_uploadWithoutPatch": "npm run _prepareUpload && npm run _uploadBuild && npm run clean",
+    "upload": "npm version patch && npm run _uploadWithoutPatch",
+    "clean": "rm -rf ./build && gts clean",
+    "lint": "gts lint",
+    "fix": "gts fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NilsBaumgartner1994/consys.git"
+  },
+  "keywords": [
+    "firebolt",
+    "api"
+  ],
+  "author": "Nils Baumgartner",
+  "contributors": [
+    {
+      "name": "Nils Baumgartner",
+      "email": "nilsbaumgartner1994@gmail.com",
+      "url": "https://github.com/NilsBaumgartner1994"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NilsBaumgartner1994/consys/issues"
+  },
+  "homepage": "https://github.com/NilsBaumgartner1994/consys#readme",
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "@types/node": "^16.0.0",
+    "faker": "^5.5.3",
+    "coveralls": "^3.1.1",
+    "gts": "^3.1.0",
+    "jest": "^27.0.6",
+    "nodemon": "^2.0.9",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^27.0.3",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "@babel/preset-typescript": "^7.14.5",
+    "node-fetch": "^2.6.1"
+  }
+}
