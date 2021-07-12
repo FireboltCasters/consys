@@ -40,6 +40,7 @@
 A system for checking constraints.
 
 ## Contributors
+
 The FireboltCasters
 
 <a href="https://github.com/NilsBaumgartner1994/consys"><img src="https://contrib.rocks/image?repo=NilsBaumgartner1994/consys" alt="Contributors" /></a>
