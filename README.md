@@ -32,17 +32,13 @@
 </p>
 
 <p align="center">
-    Abfallwirtschaft Vechta - API
+    Constraint System
 </p>
-
-## Disclaimer
-
-This is not an official package from the "Abfallwirtschaft Vechta". It is only an API by parsing the informations from the website.
 
 ## About
 
-TODO
+A system for checking constraints.
 
 ## Contributors
 
-<a href="https://github.com/NilsBaumgartner1994/firebolt-connector"><img src="https://contrib.rocks/image?repo=NilsBaumgartner1994/consys" alt="Contributors" /></a>
+<a href="https://github.com/NilsBaumgartner1994/consys"><img src="https://contrib.rocks/image?repo=NilsBaumgartner1994/consys" alt="Contributors" /></a>
