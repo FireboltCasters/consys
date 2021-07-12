@@ -25,8 +25,11 @@
     "url": "git+https://github.com/NilsBaumgartner1994/consys.git"
   },
   "keywords": [
-    "firebolt",
-    "api"
+    "consys",
+    "constraint checking",
+    "constraints",
+    "constraint evaluation",
+    "model validation"
   ],
   "author": "Nils Baumgartner",
   "contributors": [
