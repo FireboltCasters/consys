@@ -6,9 +6,7 @@
  * @class Consys
  */
 export default class Consys {
-    
-    static exampleValue(number: number) : number{
-        return number;
-    }
-
+  static exampleValue(number: number): number {
+    return number;
+  }
 }
