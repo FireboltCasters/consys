@@ -14,7 +14,7 @@ export default class Event {
   constructor(date: Date, label: string, provider: string) {
     this.date = date;
     this.label = label;
-    this.provider = provider
+    this.provider = provider;
     if (!this.isValid()) {
       throw new Error('Event is not valid!');
     }
@@ -22,7 +22,7 @@ export default class Event {
 
   isValid() {
     return (
-        Object.prototype.toString.call(this.date) === '[object Date]' && //check if valid date //https://stackoverflow.com/questions/643782/how-to-check-whether-an-object-is-a-date
+      Object.prototype.toString.call(this.date) === '[object Date]' && //check if valid date //https://stackoverflow.com/questions/643782/how-to-check-whether-an-object-is-a-date
       FieldHelper.hasNotEmptyStringFields(this, 'label', 'provider')
     );
   }

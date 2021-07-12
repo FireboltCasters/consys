@@ -10,7 +10,6 @@ import Street from '../models/Street';
  * @class StreetDownloadHelper
  */
 export default class StreetDownloadHelper {
-
   //Response jQuery18308012909501872008_1616924580830({"strassen":[{"id":"542","label":"Bernhardstraße","value":"Bernhardstraße","pamo":"4","siemer":"1","abfuhrbezirk":"1"});
   static async searchStreetOnly(
     year: number,
@@ -29,8 +28,10 @@ export default class StreetDownloadHelper {
     );
     const answer = await response.text();
     const listOfStreetJSONRaw =
-        StreetDownloadHelper.extractStreetJSONResponse(answer);
-    return StreetDownloadHelper.transformStreetResponceToClass(listOfStreetJSONRaw);
+      StreetDownloadHelper.extractStreetJSONResponse(answer);
+    return StreetDownloadHelper.transformStreetResponceToClass(
+      listOfStreetJSONRaw
+    );
   }
 
   static extractStreetJSONResponse(answer: any) {

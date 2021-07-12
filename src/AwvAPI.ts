@@ -10,7 +10,6 @@ import Street from './models/Street';
  * @class Consys
  */
 export default class Consys {
-
   static async downloadAllCitiesAndStreets(year: number) {
     const allCities = await Consys.downloadAllCities(year);
     for (const city of allCities) {
@@ -30,7 +29,5 @@ export default class Consys {
     return StreetDownloadHelper.searchStreetOnly(year, city.id, '');
   }
 
-  static async downloadEventsForStreet(year: number, street: Street) {
-
-  }
+  static async downloadEventsForStreet(year: number, street: Street) {}
 }

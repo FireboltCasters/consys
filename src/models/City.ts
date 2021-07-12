@@ -27,7 +27,7 @@ export default class City {
     this.streets = streets;
   }
 
-  getStreets(){
+  getStreets() {
     return this.streets;
   }
 
