@@ -1,4 +1,4 @@
-import Consys from "../Consys";
+import Consys from '../Consys';
 
 test('Basic test example', async () => {
   const myVariable = 4;
