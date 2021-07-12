@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NilsBaumgartner1994/consys.git"
+    "url": "git+https://github.com/FireboltCasters/consys.git"
   },
   "keywords": [
     "firebolt",
@@ -33,14 +33,14 @@
     {
       "name": "Nils Baumgartner",
       "email": "nilsbaumgartner1994@gmail.com",
-      "url": "https://github.com/NilsBaumgartner1994"
+      "url": "https://github.com/FireboltCasters"
     }
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/NilsBaumgartner1994/consys/issues"
+    "url": "https://github.com/FireboltCasters/consys/issues"
   },
-  "homepage": "https://github.com/NilsBaumgartner1994/consys#readme",
+  "homepage": "https://github.com/FireboltCasters/consys#readme",
   "devDependencies": {
     "@types/jest": "^26.0.23",
     "@types/node": "^16.0.0",

@@ -1,5 +1,4 @@
 import {ConstraintData} from './Constraint';
-import {number} from 'prop-types';
 
 class Symbols {
   // general
