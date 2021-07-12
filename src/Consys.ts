@@ -5,6 +5,4 @@
  *
  * @class Consys
  */
-export default class Consys {
-
-}
+export default class Consys {}
