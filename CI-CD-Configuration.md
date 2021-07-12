@@ -24,7 +24,7 @@
     - Add .github/workflows/build.yml to the repo
       - Check correct branch: master-->main
     - Add sonar-project.properties
-    - Add `SONAR-TOKEN` to Git-Repo
+    - Add `SONAR_TOKEN` to Git-Repo
   - Configure New Code after first analysis to "Previous version"
     - All code that has changed since the previous version bump is considered new code
 
@@ -37,6 +37,8 @@
   - https://app.fossa.com/projects
 
 ### NPM Publish CI/CD
+
+`for new project`
 
 - Add new Secret to Git-Repo: NPM_TOKEN
   - https://docs.npmjs.com/creating-and-viewing-access-tokens
