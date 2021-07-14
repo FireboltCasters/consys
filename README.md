@@ -8,7 +8,7 @@
   <a href="https://img.shields.io/github/last-commit/FireboltCasters/consys?logo=git"><img src="https://img.shields.io/github/last-commit/FireboltCasters/consys?logo=git" alt="last commit" /></a>
   <a href="https://www.npmjs.com/package/consys"><img src="https://img.shields.io/npm/dm/consys.svg" alt="downloads week" /></a>
   <a href="https://www.npmjs.com/package/consys"><img src="https://img.shields.io/npm/dt/consys.svg" alt="downloads total" /></a>
-  <a href="https://bundlephobia.com/result?p=consys"><img src="https://badgen.net/bundlephobia/minzip/consys" alt="size" /></a>
+  <a href="https://github.com/FireboltCasters/consys"><img src="https://shields.io/github/languages/code-size/FireboltCasters/consys" alt="size" /></a>
   <a href="https://david-dm.org/FireboltCasters/consysg"><img src="https://david-dm.org/FireboltCasters/consys/status.svg" alt="dependencies" /></a>
   <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FFireboltCasters%2Fconsys?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FFireboltCasters%2Fconsys.svg?type=shield"/></a>
   <a href="https://github.com/google/gts" alt="Google TypeScript Style"><img src="https://img.shields.io/badge/code%20style-google-blueviolet.svg"/></a>
