@@ -31,8 +31,13 @@
     "constraint evaluation",
     "model validation"
   ],
-  "author": "Nils Baumgartner",
+  "author": "Steffen Droppelmann",
   "contributors": [
+    {
+      "name": "Steffen Droppelmann",
+      "email": "steffen.droppelmann@gmail.com",
+      "url": "https://github.com/sdroppelmann"
+    },
     {
       "name": "Nils Baumgartner",
       "email": "nilsbaumgartner1994@gmail.com",
