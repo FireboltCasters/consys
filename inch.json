@@ -1,11 +1,6 @@
 {
   "files": {
-    "included": [
-      "src/**/*.ts"
-    ],
-    "excluded": [
-      "src/ignoreCoverage/**/*",
-      "src/tests/**/*"
-    ]
+    "included": ["src/**/*.ts"],
+    "excluded": ["src/ignoreCoverage/**/*", "src/tests/**/*"]
   }
 }
