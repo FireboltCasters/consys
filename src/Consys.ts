@@ -6,7 +6,6 @@
  * @class Consys
  */
 export default class Consys {
-
   /**
    * Creates a condition that allows only n simultaneous executions
    * of a guarded function
