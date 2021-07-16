@@ -28,6 +28,10 @@ test('ConstraintSystem Test', async () => {
                 assertion: "WHEN(LENGTH('Test') == 4): LENGTH($time) - LENGTH(#currentTime) == ZERO",
                 message: "failed1"
             });
+            system.addConstraint({
+                assertion: "ALWAYS: $time == '5:00'",
+                message: "failed2"
+            });
         }
 
         async registerFunctions(system: ConstraintSystem<Model, State>): Promise<void> {
@@ -58,7 +62,7 @@ test('ConstraintSystem Test', async () => {
 
     const plugin = new Plugin();
     await plugin.init();
-    const evaluation = plugin.evaluate(model, state);
+    const evaluation = plugin.evaluate([model], state);
     expect(evaluation.length).toBe(1);
     const instance = evaluation[0];
     expect(instance.message).toBe("failed0");
