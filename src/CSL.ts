@@ -534,8 +534,7 @@ export default class CSL {
       }
       return token.replace(Symbols.STATE_PREFIX, 'this.state.');
     } else if (this.isStatementToken(token)) {
-      return `
-                        this.functions['${token}'](this.model, this.state)`;
+      return `this.functions['${token}'](this.model, this.state)`;
     } else if (this.isFunctionToken(token)) {
       return this.parseFunctionToken(token);
     } else if (CSL.isString(token)) {
