@@ -25,7 +25,7 @@ test('ConstraintSystem Test', async () => {
                 message: "failed0"
             });
             system.addConstraint({
-                assertion: "ALWAYS: LENGTH($time) - LENGTH(#currentTime) == ZERO",
+                assertion: "WHEN(LENGTH('Test') == 4): LENGTH($time) - LENGTH(#currentTime) == ZERO",
                 message: "failed1"
             });
         }
@@ -45,7 +45,14 @@ test('ConstraintSystem Test', async () => {
                 currentTime: "4:00"
             }
             expect(system.getMessage("ZERO", model, state)).toBe("0");
-            expect(system.getMessage("LENGTH($time)", model, state)).toBe("4");
+            expect(system.getMessage("$time", model, state)).toBe("1:00");
+            expect(system.getMessage("#currentTime", model, state)).toBe("4:00");
+            expect(system.getMessage("Length is LENGTH($time), is it?", model, state))
+                .toBe("Length is 4, is it?");
+            expect(system.getMessage("Length is LENGTH('Four'), is it?", model, state))
+                .toBe("Length is 4, is it?");
+            expect(system.getMessage("Length is 4.5, is it?", model, state))
+                .toBe("Length is 4.5, is it?");
         }
     }
 
