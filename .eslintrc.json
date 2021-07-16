@@ -2,8 +2,5 @@
   "extends": "./node_modules/gts/",
   "parserOptions": {
     "sourceType": "module"
-  },
-  "rules": {
-    "indent": ["error", 4]
   }
 }
