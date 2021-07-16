@@ -21,7 +21,7 @@ test('ConstraintSystem Test', async () => {
     class Plugin extends ConstraintSystemPlugin<Model, State> {
         async registerConstraints(system: ConstraintSystem<Model, State>): Promise<void> {
             system.addConstraint({
-                assertion: "ALWAYS: LENGTH($time) && LENGTH(#currentTime) < $maxLength",
+                assertion: "ALWAYS: LENGTH($time) && LENGTH(#currentTime) && LENGTH('Test') < $maxLength",
                 message: "failed0"
             });
             system.addConstraint({
@@ -45,6 +45,7 @@ test('ConstraintSystem Test', async () => {
                 currentTime: "4:00"
             }
             expect(system.getMessage("ZERO", model, state)).toBe("0");
+            expect(system.getMessage("LENGTH($time)", model, state)).toBe("4");
         }
     }
 
