@@ -1,4 +1,8 @@
 /* istanbul ignore file */
-import Consys from './Consys';
+import Constraint from "./Constraint";
+import ConstraintSystem from "./ConstraintSystem";
+import ConstraintSystemPlugin from "./ConstraintSystemPlugin";
 
-export {Consys};
+export {Constraint};
+export {ConstraintSystem};
+export {ConstraintSystemPlugin as Plugin};
