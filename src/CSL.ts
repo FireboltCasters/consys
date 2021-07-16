@@ -519,8 +519,7 @@ export default class CSL {
       }
     }
 
-    return `
-                        this.functions['${funName}'](${argSymbols})`;
+    return `this.functions['${funName}'](${argSymbols})`;
   }
 
   private getSymbolForToken(token: string): string {
