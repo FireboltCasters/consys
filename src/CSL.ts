@@ -69,7 +69,7 @@ export default class CSL {
    * Returns the object value of a nested string key such as 'test.anotherTest.value'
    * @param object object to be searched for key
    * @param keyChain key string separated by dots
-   * @private 
+   * @private
    */
   private static getObjectValue<T>(object: T, keyChain: string): any {
     try {
