@@ -1,6 +1,9 @@
 import {ConstraintData} from './Constraint';
 import FunctionGenerator from './ignoreCoverage/FunctionGenerator';
 
+/**
+ * These are all of the symbols used for the DSL.
+ */
 class Symbols {
   // general
   static readonly COND_SEPARATOR = ':';
@@ -56,9 +59,18 @@ class Symbols {
   ].map(symbol => symbol.charAt(0));
 }
 
+/**
+ * This class manages all constraint generation and DSL specific tasks.
+ */
 export default class CSL {
   private readonly customFunctions: string[] = [];
 
+  /**
+   * Returns the object value of a nested string key such as 'test.anotherTest.value'
+   * @param object object to be searched for key
+   * @param keyChain key string separated by dots
+   * @private 
+   */
   private static getObjectValue<T>(object: T, keyChain: string): any {
     try {
       let value: any = object;
