@@ -28,14 +28,6 @@
   - Configure New Code after first analysis to "Previous version"
     - All code that has changed since the previous version bump is considered new code
 
-### Fossa
-
-`for new project`
-
-- Check the if any license problems are found
-- Add the Repo
-  - https://app.fossa.com/projects
-
 ### NPM Publish CI/CD
 
 `for new project`
