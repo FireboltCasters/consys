@@ -82,5 +82,4 @@ test('ConstraintSystem Test', async () => {
   const instance = evaluation[0];
   expect(instance.message).toBe('failed0');
   expect(instance.consistent).toBe(false);
-  expect(true).toBe(false);
 });
