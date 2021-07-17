@@ -1,12 +1,12 @@
 {
   "name": "consys",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "consys",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
     "coverage": "jest --coverage",
-    "test": "pwd && npm run build && npm run testOnly",
+    "test": "npm run build && npm run testOnly",
     "testOnly": "npm run coverage",
     "start": "npm run build && node ./build/ignoreCoverage/development.js",
     "_prepareBuild": "rm -rf ./build",
