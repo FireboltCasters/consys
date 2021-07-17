@@ -3,9 +3,6 @@
 ## Used Pipelines
 
 - SonarCloud
-- Travis-CI
-- Coveralls
-- Fossa
 - Lint Action
 
 ### README.md
