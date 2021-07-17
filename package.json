@@ -1,6 +1,6 @@
 {
   "name": "consys",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "consys",
   "main": "index.js",
   "types": "index.d.ts",
