@@ -31,10 +31,10 @@
 
 **consys** is a flexible tool to evaluate models using generic and readable constraints.
 
-* **Modern & Lightweight:** consys has full TypeScript support and uses no additional dependencies, so it can easily be integrated.
-* **Customizable:** Register custom functions and plugins, tailered to your application.
-* **Flexible:** consys defines its own domain specific language to manage constraints, making it fully generic.
-* **User friendly** Constraints are designed to be as flexible as possible, while still being readable.
+- **Modern & Lightweight:** consys has full TypeScript support and uses no additional dependencies, so it can easily be integrated.
+- **Customizable:** Register custom functions and plugins, tailered to your application.
+- **Flexible:** consys defines its own domain specific language to manage constraints, making it fully generic.
+- **User friendly** Constraints are designed to be as flexible as possible, while still being readable.
 
 ## Installation
 
@@ -54,18 +54,18 @@ import * as ConSys from 'consys';
 
 // This is our simple model, with one age entry
 type TableRow = {
-    entryAge: number;
+  entryAge: number;
 };
 
 // Now, lets create our constraint system
 const system = new ConSys.ConstraintSystem<TableRow, {}>();
 
-// For our constraint, lets choose a simple assertion that must always be true: 
+// For our constraint, lets choose a simple assertion that must always be true:
 // The age entry of our model should always be less than 21.
 // If that should not be the case, our custom message will be returned in the evaluation.
 let constraint = {
-    assertion: "ALWAYS: $entryAge < 21",
-    message: "The current age is $entryAge, but it can not be greater than 20."
+  assertion: 'ALWAYS: $entryAge < 21',
+  message: 'The current age is $entryAge, but it can not be greater than 20.',
 };
 
 // Now, we can add the constraint to the system
@@ -73,8 +73,8 @@ system.addConstraint(constraint);
 
 // Before we can evaluate something though, we need to create a new instance of our model
 let model: TableRow = {
-    entryAge: 24
-}
+  entryAge: 24,
+};
 
 // Lets evaluate our model instance
 let reports: ConSys.Report<TableRow, {}>[] = system.evaluate(model, {});
@@ -87,7 +87,7 @@ let report = reports[0];
 // there should only be one evaluation
 let evaluation = report.evaluations[0];
 
-// Finally, we get our message: 
+// Finally, we get our message:
 // "The current age is 24, but it can not be greater than 20."
 let message = evaluation.message;
 ```
