@@ -2,7 +2,6 @@
  * Helper class to generate a javascript function.
  */
 export default class FunctionGenerator {
-
   /**
    * Generates a javascript function from a string.
    *
