@@ -680,6 +680,16 @@ export default class ConstraintGenerator {
             }
         }
 
+        return this.getStringFromTokens(tokens);
+    }
+
+    /**
+     * Returns a conditional javascript string given a token array.
+     *
+     * @param tokens token array
+     * @private
+     */
+    private getStringFromTokens(tokens: string[]): string {
         if (Config.DEBUG_LOG) {
             console.log("Original tokens: ", tokens);
         }

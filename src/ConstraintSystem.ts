@@ -133,8 +133,7 @@ export default class ConstraintSystem<M, S> {
      */
     private evaluateMultiple(models: M[], state: S): Report<M, S>[] {
         let reports: Report<M, S>[] = [];
-        for (let i = 0; i < models.length; i++) {
-            let model = models[i];
+        for (let model of models) {
             let report = this.evaluateSingle(model, state);
             reports.push(report);
         }
