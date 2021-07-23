@@ -1,6 +1,7 @@
 import Constraint, {ConstraintData} from './Constraint';
 import ConstraintGenerator from './ConstraintGenerator';
 import ConstraintSystemPlugin from './ConstraintSystemPlugin';
+import Config from "./Config";
 
 /**
  * Evaluation data for a single constraint.
@@ -22,12 +23,41 @@ export interface Report<M, S> {
 }
 
 /**
+ * Filter function for evaluations.
+ */
+export type EvaluationFilterFunction = (evaluation: Evaluation) => boolean;
+
+/**
+ * Filter type for filtering evaluations.
+ */
+export type EvaluationFilter = "all" | "consistent" | "inconsistent" | EvaluationFilterFunction;
+
+/**
  * A constraint system with multiple constraints and custom functions, defined for specific model and state types.
  */
 export default class ConstraintSystem<M, S> {
   private readonly functions: {[key: string]: Function} = {};
   private readonly constraints: Constraint<any, M, S>[] = [];
-  private readonly csl: ConstraintGenerator = new ConstraintGenerator();
+  private readonly generator: ConstraintGenerator = new ConstraintGenerator();
+
+  /**
+   * For a given evaluation filter type, return the corresponding function
+   *
+   * @param evaluationFilter filter type
+   * @private
+   */
+  private static getFilterFunction(evaluationFilter: EvaluationFilter): EvaluationFilterFunction {
+    switch (evaluationFilter) {
+      case "all":
+        return () => true;
+      case "consistent":
+        return (evaluation: Evaluation) => evaluation.consistent;
+      case "inconsistent":
+        return (evaluation: Evaluation) => !evaluation.consistent;
+      default:
+        return evaluationFilter;
+    }
+  }
 
   /**
    * Registers a plugin for this constraint system.
@@ -40,9 +70,11 @@ export default class ConstraintSystem<M, S> {
       .then(() =>
         plugin
           .registerConstraints(this)
-          .then(() =>
-            console.log('Registered plugin: ' + plugin.constructor.name)
-          )
+          .then(() => {
+            if (Config.DEBUG_LOG) {
+              console.log('Registered plugin: ' + plugin.constructor.name)
+            }
+          })
       );
   }
 
@@ -52,7 +84,7 @@ export default class ConstraintSystem<M, S> {
    * @param resource constraint data
    */
   addConstraint<T extends ConstraintData>(resource: T) {
-    this.constraints.push(new Constraint(resource, this.csl));
+    this.constraints.push(new Constraint(resource, this.generator));
   }
 
   /**
@@ -84,7 +116,7 @@ export default class ConstraintSystem<M, S> {
    */
   private addFun(name: string, fun: Function) {
     this.functions[name] = fun;
-    this.csl.registerFunction(name);
+    this.generator.registerFunction(name);
   }
 
   /**
@@ -92,36 +124,31 @@ export default class ConstraintSystem<M, S> {
    *
    * @param model model to be evaluated
    * @param state state to be evaluated
+   * @param include optionally filter evaluations of reports
    */
-  evaluate(model: M | M[], state: S): Report<M, S>[] {
+  evaluate(model: M | M[], state: S, include: EvaluationFilter = "all"): Report<M, S>[] {
+    let reports: Report<M, S>[];
     if (model instanceof Array) {
-      return this.evaluateMultiple(model, state);
+      reports = this.evaluateMultiple(model, state);
+    } else {
+      reports = [this.evaluateSingle(model, state)];
     }
-    return [this.evaluateSingle(model, state)];
+    this.filterReportEvaluation(reports, include);
+    return reports;
   }
 
   /**
-   * Returns a converted message string by replacing function calls or model and state variables with their
-   * actual current value.
+   * Filters evaluations of reports based on a given function.
    *
-   * @param msgString message to be converted
-   * @param model model
-   * @param state state
-   */
-  getMessage(msgString: string, model: M, state: S): string {
-    return this.csl.getMessage(msgString, model, state, this.functions);
-  }
-
-  /**
-   * Returns all constraint data that was registered.
+   * @param reports reports for which evaluations are filtered
+   * @param evaluationFilter filter function
    * @private
    */
-  private getConstraintData(): ConstraintData[] {
-    let res: ConstraintData[] = [];
-    for (let constraint of this.constraints) {
-      res.push(constraint.getResource());
+  private filterReportEvaluation(reports: Report<M, S>[], evaluationFilter: EvaluationFilter) {
+    for (let report of reports) {
+      let evaluation: Evaluation[] = report.evaluation;
+      report.evaluation = evaluation.filter(ConstraintSystem.getFilterFunction(evaluationFilter));
     }
-    return res;
   }
 
   /**
@@ -156,9 +183,7 @@ export default class ConstraintSystem<M, S> {
     };
     for (let constraint of this.constraints) {
       let evaluation = constraint.evaluate(data);
-      if (!evaluation.consistent) {
-        evaluationRes.push(evaluation);
-      }
+      evaluationRes.push(evaluation);
     }
     let constraintData = this.getConstraintData();
     return {
@@ -167,5 +192,29 @@ export default class ConstraintSystem<M, S> {
       checkedConstraints: constraintData,
       evaluation: evaluationRes,
     };
+  }
+
+  /**
+   * Returns a converted message string by replacing function calls or model and state variables with their
+   * actual current value.
+   *
+   * @param msgString message to be converted
+   * @param model model
+   * @param state state
+   */
+  getMessage(msgString: string, model: M, state: S): string {
+    return this.generator.getMessage(msgString, model, state, this.functions);
+  }
+
+  /**
+   * Returns all constraint data that was registered.
+   * @private
+   */
+  private getConstraintData(): ConstraintData[] {
+    let res: ConstraintData[] = [];
+    for (let constraint of this.constraints) {
+      res.push(constraint.getResource());
+    }
+    return res;
   }
 }

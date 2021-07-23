@@ -1,5 +1,4 @@
-import ConstraintSystem from '../ConstraintSystem';
-import ConstraintSystemPlugin from '../ConstraintSystemPlugin';
+import * as ConSys from '../index';
 
 type Model = {
   time: string;
@@ -26,29 +25,32 @@ test('ConstraintSystem Test', async () => {
       assertion:
         "ALWAYS: LENGTH($time) && LENGTH(#currentTime) && LENGTH('Test') < $maxLength",
       message: 'failed0',
+      id: 0
     },
     {
       assertion:
         "WHEN(LENGTH('Test') == 4): LENGTH($time) - LENGTH(#currentTime) == ZERO",
       message: 'failed1',
+      id: 1
     },
     {
       assertion: "ALWAYS: $time == '5:00'",
       message: 'failed2',
+      id: 2
     },
   ];
 
   /**
    * Custom constraint system plugin.
    */
-  class Plugin extends ConstraintSystemPlugin<Model, State> {
+  class Plugin extends ConSys.Plugin<Model, State> {
     /**
      * Register the constraints defined above.
      *
      * @param system constraint system
      */
     async registerConstraints(
-      system: ConstraintSystem<Model, State>
+      system: ConSys.ConstraintSystem<Model, State>
     ): Promise<void> {
       for (let data of constraintData) {
         system.addConstraint(data);
@@ -61,7 +63,7 @@ test('ConstraintSystem Test', async () => {
      * @param system constraint system
      */
     async registerFunctions(
-      system: ConstraintSystem<Model, State>
+      system: ConSys.ConstraintSystem<Model, State>
     ): Promise<void> {
       system.addFunction('LENGTH', (string: string) => {
         return string.length;
@@ -99,9 +101,17 @@ test('ConstraintSystem Test', async () => {
 
   const plugin = new Plugin();
   await plugin.init();
-  const report = plugin.evaluate([model], state);
-  expect(report.length).toBe(1);
-  const instance = report[0];
+  const report0 = plugin.evaluate([model], state, "inconsistent");
+  const report1 = plugin.evaluate(model, state, "consistent");
+  const report2 = plugin.evaluate(model, state, "all");
+  const report3 = plugin.evaluate(model, state, (evaluation) => evaluation.resource.id === 0);
+  const report4 = plugin.evaluate(model, state);
+  expect(report0[0].evaluation.length).toBe(1);
+  expect(report1[0].evaluation.length).toBe(2);
+  expect(report2[0].evaluation.length).toBe(3);
+  expect(report3[0].evaluation.length).toBe(1);
+  expect(report4[0].evaluation.length).toBe(3);
+  const instance = report0[0];
   expect(instance.checkedModel).toBe(model);
   expect(instance.checkedState).toBe(state);
   expect(JSON.stringify(instance.checkedConstraints)).toBe(
