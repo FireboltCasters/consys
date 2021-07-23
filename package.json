@@ -26,10 +26,12 @@
   },
   "keywords": [
     "consys",
-    "constraint checking",
+    "constraint",
     "constraints",
-    "constraint evaluation",
-    "model validation"
+    "checker",
+    "evaluation",
+    "model",
+    "validation"
   ],
   "author": "Steffen Droppelmann",
   "contributors": [
