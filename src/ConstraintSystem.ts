@@ -1,7 +1,7 @@
 import Constraint, {ConstraintData} from './Constraint';
 import ConstraintGenerator from './ConstraintGenerator';
 import ConstraintSystemPlugin from './ConstraintSystemPlugin';
-import Config from "./Config";
+import Config from './Config';
 
 /**
  * Evaluation data for a single constraint.
@@ -30,7 +30,11 @@ export type EvaluationFilterFunction = (evaluation: Evaluation) => boolean;
 /**
  * Filter type for filtering evaluations.
  */
-export type EvaluationFilter = "all" | "consistent" | "inconsistent" | EvaluationFilterFunction;
+export type EvaluationFilter =
+  | 'all'
+  | 'consistent'
+  | 'inconsistent'
+  | EvaluationFilterFunction;
 
 /**
  * A constraint system with multiple constraints and custom functions, defined for specific model and state types.
@@ -46,13 +50,15 @@ export default class ConstraintSystem<M, S> {
    * @param evaluationFilter filter type
    * @private
    */
-  private static getFilterFunction(evaluationFilter: EvaluationFilter): EvaluationFilterFunction {
+  private static getFilterFunction(
+    evaluationFilter: EvaluationFilter
+  ): EvaluationFilterFunction {
     switch (evaluationFilter) {
-      case "all":
+      case 'all':
         return () => true;
-      case "consistent":
+      case 'consistent':
         return (evaluation: Evaluation) => evaluation.consistent;
-      case "inconsistent":
+      case 'inconsistent':
         return (evaluation: Evaluation) => !evaluation.consistent;
       default:
         return evaluationFilter;
@@ -65,17 +71,13 @@ export default class ConstraintSystem<M, S> {
    * @param plugin plugin to be registered
    */
   async registerPlugin(plugin: ConstraintSystemPlugin<M, S>) {
-    plugin
-      .registerFunctions(this)
-      .then(() =>
-        plugin
-          .registerConstraints(this)
-          .then(() => {
-            if (Config.DEBUG_LOG) {
-              console.log('Registered plugin: ' + plugin.constructor.name)
-            }
-          })
-      );
+    plugin.registerFunctions(this).then(() =>
+      plugin.registerConstraints(this).then(() => {
+        if (Config.DEBUG_LOG) {
+          console.log('Registered plugin: ' + plugin.constructor.name);
+        }
+      })
+    );
   }
 
   /**
@@ -126,7 +128,11 @@ export default class ConstraintSystem<M, S> {
    * @param state state to be evaluated
    * @param include optionally filter evaluations of reports
    */
-  evaluate(model: M | M[], state: S, include: EvaluationFilter = "all"): Report<M, S>[] {
+  evaluate(
+    model: M | M[],
+    state: S,
+    include: EvaluationFilter = 'all'
+  ): Report<M, S>[] {
     let reports: Report<M, S>[];
     if (model instanceof Array) {
       reports = this.evaluateMultiple(model, state);
@@ -144,10 +150,15 @@ export default class ConstraintSystem<M, S> {
    * @param evaluationFilter filter function
    * @private
    */
-  private filterReportEvaluation(reports: Report<M, S>[], evaluationFilter: EvaluationFilter) {
+  private filterReportEvaluation(
+    reports: Report<M, S>[],
+    evaluationFilter: EvaluationFilter
+  ) {
     for (let report of reports) {
       let evaluation: Evaluation[] = report.evaluation;
-      report.evaluation = evaluation.filter(ConstraintSystem.getFilterFunction(evaluationFilter));
+      report.evaluation = evaluation.filter(
+        ConstraintSystem.getFilterFunction(evaluationFilter)
+      );
     }
   }
 

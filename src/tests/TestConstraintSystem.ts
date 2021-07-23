@@ -25,18 +25,18 @@ test('ConstraintSystem Test', async () => {
       assertion:
         "ALWAYS: LENGTH($time) && LENGTH(#currentTime) && LENGTH('Test') < $maxLength",
       message: 'failed0',
-      id: 0
+      id: 0,
     },
     {
       assertion:
         "WHEN(LENGTH('Test') == 4): LENGTH($time) - LENGTH(#currentTime) == ZERO",
       message: 'failed1',
-      id: 1
+      id: 1,
     },
     {
       assertion: "ALWAYS: $time == '5:00'",
       message: 'failed2',
-      id: 2
+      id: 2,
     },
   ];
 
@@ -101,10 +101,14 @@ test('ConstraintSystem Test', async () => {
 
   const plugin = new Plugin();
   await plugin.init();
-  const report0 = plugin.evaluate([model], state, "inconsistent");
-  const report1 = plugin.evaluate(model, state, "consistent");
-  const report2 = plugin.evaluate(model, state, "all");
-  const report3 = plugin.evaluate(model, state, (evaluation) => evaluation.resource.id === 0);
+  const report0 = plugin.evaluate([model], state, 'inconsistent');
+  const report1 = plugin.evaluate(model, state, 'consistent');
+  const report2 = plugin.evaluate(model, state, 'all');
+  const report3 = plugin.evaluate(
+    model,
+    state,
+    evaluation => evaluation.resource.id === 0
+  );
   const report4 = plugin.evaluate(model, state);
   expect(report0[0].evaluation.length).toBe(1);
   expect(report1[0].evaluation.length).toBe(2);

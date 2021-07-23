@@ -23,7 +23,11 @@ export default abstract class ConstraintSystemPlugin<M, S> {
    * @param state state to be evaluated
    * @param include optionally filter evaluations of reports
    */
-  evaluate(model: M | M[], state: S, include: EvaluationFilter = "all"): Report<M, S>[] {
+  evaluate(
+    model: M | M[],
+    state: S,
+    include: EvaluationFilter = 'all'
+  ): Report<M, S>[] {
     return this.system.evaluate(model, state, include);
   }
 
