@@ -1,7 +1,7 @@
 import {ConstraintData} from './Constraint';
 import FunctionGenerator from './ignoreCoverage/FunctionGenerator';
 import Config from './Config';
-import {Symbols} from "./Symbols";
+import {Symbols} from './Symbols';
 
 /**
  * This class manages all constraint generation and DSL specific tasks.
@@ -16,7 +16,11 @@ export default class ConstraintGenerator {
    * @param stringify determines if the whole object should be returned as a string
    * @private
    */
-  private static getObjectValue<T>(object: T, keyChain: string, stringify: boolean = false): any {
+  private static getObjectValue<T>(
+    object: T,
+    keyChain: string,
+    stringify: boolean = false
+  ): any {
     if (keyChain === '') {
       return stringify ? JSON.stringify(object) : object;
     }
@@ -274,7 +278,6 @@ export default class ConstraintGenerator {
    * @param srcString string to be tokenized
    */
   getMessageTokens(srcString: string): string[] {
-
     if (srcString.length === 1) {
       return [srcString];
     }
