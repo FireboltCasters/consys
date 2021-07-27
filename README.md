@@ -31,10 +31,10 @@
 
 **consys** is a flexible tool to evaluate models using generic and readable constraints.
 
-- **Modern & Lightweight:** consys has full TypeScript support and uses no additional dependencies, so it can easily be integrated.
-- **Customizable:** Register custom functions and plugins, tailered to your application.
-- **Flexible:** consys defines its own domain specific language to manage constraints, making it fully generic.
-- **User friendly** Constraints are designed to be as flexible as possible, while still being readable.
+- **Modern & Lightweight:** consys has full TypeScript support and uses little additional dependencies, so it can easily be integrated.
+- **Customizable:** Register custom functions and plugins, tailered to the application.
+- **Flexible:** Constraints are designed to be as flexible as possible, while still being readable.
+- **User friendly:** consys defines its own domain specific language to manage constraints, making it easy to read and fully generic.
 
 ## Installation
 
@@ -81,15 +81,15 @@ let reports: ConSys.Report<TableRow, {}>[] = system.evaluate(model, {});
 
 // We will get back an array of reports, but in our case there should only be one,
 // since we only evaluated one model instance
-let report = reports[0];
+let report: ConSys.Report<TableRow, {}> = reports[0];
 
 // Again, we get back an array of evaluations, but since we only have one constraint,
 // there should only be one evaluation
-let evaluation = report.evaluations[0];
+let evaluation: ConSys.Evaluation = report.evaluations[0];
 
 // Finally, we get our message:
 // "The current age is 24, but it can not be greater than 20."
-let message = evaluation.message;
+let message: string = evaluation.message;
 ```
 
 For a more detailed look into all of the features, including the assertion syntax, custom functions, plugins and more, please have a look into the [wiki](https://github.com/FireboltCasters/consys/wiki).
