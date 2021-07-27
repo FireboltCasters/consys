@@ -1,4 +1,3 @@
-
 <h1><a href="https://www.npmjs.com/package/consys"><img src="https://user-images.githubusercontent.com/37511270/127232757-a7fcfdbf-44d1-429a-8531-41a3d0d9e40d.png" width="50" heigth="50" /></a><a href="https://www.npmjs.com/package/consys">consys</a> - flexible model-constraint checking</h1>
 
 <p align="left">
