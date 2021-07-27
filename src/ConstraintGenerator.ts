@@ -279,9 +279,6 @@ export default class ConstraintGenerator {
       return [srcString];
     }
 
-    let modelRegex = new RegExp('\\' + Symbols.MODEL_PREFIX, 'g');
-    let stateRegex = new RegExp('\\' + Symbols.STATE_PREFIX, 'g');
-
     let res: string[] = [];
     let tokenStart = 0;
     for (let i = 0; i < srcString.length - 1; i++) {
@@ -311,24 +308,37 @@ export default class ConstraintGenerator {
       }
     }
 
-    for (let i = 0; i < res.length; i++) {
-      let token = res[i];
+    this.cutTokens(res);
+    return res;
+  }
+
+  /**
+   * Trims front and back of string tokens.
+   *
+   * @param tokens tokens to be trimmed
+   * @private
+   */
+  private cutTokens(tokens: string[]) {
+
+    let modelRegex = new RegExp('\\' + Symbols.MODEL_PREFIX, 'g');
+    let stateRegex = new RegExp('\\' + Symbols.STATE_PREFIX, 'g');
+
+    for (let i = 0; i < tokens.length; i++) {
+      let token = tokens[i];
       if (this.isStatementToken(token)) {
-        res[i] = this.cutRemainderUntilCharMatches(token, /\w/g);
+        tokens[i] = this.cutRemainderUntilCharMatches(token, /\w/g);
       } else if (this.isFunctionToken(token)) {
-        res[i] = this.cutRemainderUntilCharMatches(token, /\)/g);
+        tokens[i] = this.cutRemainderUntilCharMatches(token, /\)/g);
       } else if (token.includes(Symbols.MODEL_PREFIX)) {
         let trimmed = this.cutRemainderUntilCharMatches(token, /\w/g);
         trimmed = this.cutFrontUntilCharMatches(trimmed, modelRegex);
-        res[i] = trimmed;
+        tokens[i] = trimmed;
       } else if (token.includes(Symbols.STATE_PREFIX)) {
         let trimmed = this.cutRemainderUntilCharMatches(token, /\w/g);
         trimmed = this.cutFrontUntilCharMatches(trimmed, stateRegex);
-        res[i] = trimmed;
+        tokens[i] = trimmed;
       }
     }
-
-    return res;
   }
 
   /**
