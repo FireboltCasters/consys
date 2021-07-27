@@ -322,7 +322,6 @@ export default class ConstraintGenerator {
    * @private
    */
   private cutTokens(tokens: string[]) {
-
     let modelRegex = new RegExp('\\' + Symbols.MODEL_PREFIX, 'g');
     let stateRegex = new RegExp('\\' + Symbols.STATE_PREFIX, 'g');
 

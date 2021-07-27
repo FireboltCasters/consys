@@ -85,11 +85,11 @@ let report: ConSys.Report<TableRow, {}> = reports[0];
 
 // Again, we get back an array of evaluations, but since we only have one constraint,
 // there should only be one evaluation
-let evaluation: ConSys.Evaluation = report.evaluations[0];
+let evaluation: ConSys.Evaluation = report.evaluation[0];
 
 // Finally, we get our message:
 // "The current age is 24, but it can not be greater than 20."
-let message: string = evaluation.message;
+console.log(evaluation.message);
 ```
 
 For a more detailed look into all of the features, including the assertion syntax, custom functions, plugins and more, please have a look into the [wiki](https://github.com/FireboltCasters/consys/wiki).
