@@ -54,7 +54,7 @@ import * as ConSys from 'consys';
 
 // This is our simple model, with one age entry
 type TableRow = {
-    entryAge: number;
+  entryAge: number;
 };
 
 // Now, lets create our constraint system
@@ -64,8 +64,8 @@ const system = new ConSys.ConstraintSystem<TableRow, {}>();
 // The age entry of our model should always be less than 21.
 // If that should not be the case, our custom message will be returned in the evaluation.
 let data = {
-    constraint: 'ALWAYS: $entryAge < 21',
-    message: 'The current age is $entryAge, but it can not be greater than 20.',
+  constraint: 'ALWAYS: $entryAge < 21',
+  message: 'The current age is $entryAge, but it can not be greater than 20.',
 };
 
 // Now, we can add the constraint to the system
@@ -73,7 +73,7 @@ system.addConstraint(data);
 
 // Before we can evaluate something though, we need to create a new instance of our model
 let model: TableRow = {
-    entryAge: 24,
+  entryAge: 24,
 };
 
 // Lets evaluate our model instance
