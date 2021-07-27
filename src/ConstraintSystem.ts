@@ -36,9 +36,9 @@ export type EvaluationFilter = "all" | "consistent" | "inconsistent" | Evaluatio
  * A constraint system with multiple constraints and custom functions, defined for specific model and state types.
  */
 export default class ConstraintSystem<M, S> {
-  private readonly functions: {[key: string]: Function} = {};
-  private readonly constraints: Constraint<any, M, S>[] = [];
   private readonly generator: ConstraintGenerator = new ConstraintGenerator();
+  private readonly constraints: Constraint<ConstraintData, M, S>[] = [];
+  private readonly functions: {[key: string]: Function} = {};
 
   /**
    * For a given evaluation filter type, return the corresponding function
@@ -65,17 +65,11 @@ export default class ConstraintSystem<M, S> {
    * @param plugin plugin to be registered
    */
   async registerPlugin(plugin: ConstraintSystemPlugin<M, S>) {
-    plugin
-      .registerFunctions(this)
-      .then(() =>
-        plugin
-          .registerConstraints(this)
-          .then(() => {
-            if (Config.DEBUG_LOG) {
-              console.log('Registered plugin: ' + plugin.constructor.name)
-            }
-          })
-      );
+    await plugin.registerFunctions(this);
+    await plugin.registerConstraints(this);
+    if (Config.DEBUG_LOG) {
+      console.log('Registered plugin: ' + plugin.constructor.name)
+    }
   }
 
   /**

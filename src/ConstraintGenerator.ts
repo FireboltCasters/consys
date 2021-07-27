@@ -1,65 +1,7 @@
 import {ConstraintData} from './Constraint';
 import FunctionGenerator from './ignoreCoverage/FunctionGenerator';
 import Config from './Config';
-
-/**
- * These are all of the symbols used for the DSL.
- */
-class Symbols {
-  // general
-  static readonly COND_SEPARATOR = ':';
-  static readonly KEY_SEPARATOR = '.';
-  static readonly ARG_SEPARATOR = ',';
-
-  // activation
-  static readonly ALWAYS = 'ALWAYS';
-  static readonly WHEN = 'WHEN';
-
-  // data access
-  static readonly MODEL_PREFIX = '$';
-  static readonly STATE_PREFIX = '#';
-  static readonly STRING_SYMBOL = "'";
-
-  // comparison
-  static readonly LESS = '<';
-  static readonly LESS_EQUAL = '<=';
-  static readonly EQUAL = '==';
-  static readonly NOT_EQUAL = '!=';
-  static readonly GREATER_EQUAL = '>=';
-  static readonly GREATER = '>';
-
-  // arithmetic
-  static readonly PLUS = '+';
-  static readonly MINUS = '-';
-  static readonly TIMES = '*';
-  static readonly DIV = '/';
-  static readonly MOD = '%';
-  static readonly BRACKET_OPEN = '(';
-  static readonly BRACKET_CLOSE = ')';
-
-  // logic
-  static readonly AND = '&&';
-  static readonly OR = '||';
-
-  // only the start symbol of each operator, used for parsing
-  static readonly OPERATOR_START = [
-    Symbols.LESS,
-    Symbols.LESS_EQUAL,
-    Symbols.EQUAL,
-    Symbols.NOT_EQUAL,
-    Symbols.GREATER_EQUAL,
-    Symbols.GREATER,
-    Symbols.PLUS,
-    Symbols.MINUS,
-    Symbols.TIMES,
-    Symbols.DIV,
-    Symbols.MOD,
-    Symbols.BRACKET_OPEN,
-    Symbols.BRACKET_CLOSE,
-    Symbols.AND,
-    Symbols.OR,
-  ].map(symbol => symbol.charAt(0));
-}
+import {Symbols} from "./Symbols";
 
 /**
  * This class manages all constraint generation and DSL specific tasks.
@@ -71,24 +13,21 @@ export default class ConstraintGenerator {
    * Returns the object value of a nested string key such as 'test.anotherTest.value'
    * @param object object to be searched for key
    * @param keyChain key string separated by dots
+   * @param stringify determines if the whole object should be returned as a string
    * @private
    */
-  private static getObjectValue<T>(object: T, keyChain: string): any {
-    try {
-      if (keyChain === '') {
-        return object;
-      }
-
-      let value: any = object;
-      let keys = keyChain.split(Symbols.KEY_SEPARATOR);
-      for (let key of keys) {
-        value = value[key];
-      }
-
-      return value;
-    } catch (err) {
-      return 'UNDEFINED_VALUE';
+  private static getObjectValue<T>(object: T, keyChain: string, stringify: boolean = false): any {
+    if (keyChain === '') {
+      return stringify ? JSON.stringify(object) : object;
     }
+
+    let value: any = object;
+    let keys = keyChain.split(Symbols.KEY_SEPARATOR);
+    for (let key of keys) {
+      value = value[key];
+    }
+
+    return value;
   }
 
   /**
@@ -335,6 +274,11 @@ export default class ConstraintGenerator {
    * @param srcString string to be tokenized
    */
   getMessageTokens(srcString: string): string[] {
+
+    if (srcString.length === 1) {
+      return [srcString];
+    }
+
     let modelRegex = new RegExp('\\' + Symbols.MODEL_PREFIX, 'g');
     let stateRegex = new RegExp('\\' + Symbols.STATE_PREFIX, 'g');
 
@@ -473,11 +417,11 @@ export default class ConstraintGenerator {
     let end = endIndex;
     for (let i = startIndex + 1; i < trimmed.length; i++) {
       let endChar = trimmed.charAt(i);
-      if (i === trimmed.length - 1) {
-        end = i + 1;
-        break;
-      } else if (!endChar.match(/\w|\./g)) {
+      if (!endChar.match(/\w|\./g)) {
         end = i;
+        break;
+      } else if (i === trimmed.length - 1) {
+        end = i + 1;
         break;
       }
     }
@@ -524,11 +468,11 @@ export default class ConstraintGenerator {
     let end = endIndex;
     for (let i = startIndex; i < trimmed.length; i++) {
       let endChar = trimmed.charAt(i);
-      if (i === trimmed.length - 1) {
-        end = i + 1;
-        break;
-      } else if (!endChar.match(/[0-9]|\./g)) {
+      if (!endChar.match(/[0-9]|\./g)) {
         end = i;
+        break;
+      } else if (i === trimmed.length - 1) {
+        end = i + 1;
         break;
       }
     }
@@ -597,11 +541,11 @@ export default class ConstraintGenerator {
     let end = endIndex;
     for (let i = startIndex + 1; i < trimmed.length; i++) {
       let endChar = trimmed.charAt(i);
-      if (i === trimmed.length - 1) {
-        end = i + 1;
-        break;
-      } else if (!endChar.match(/\w/g)) {
+      if (!endChar.match(/\w/g)) {
         end = i;
+        break;
+      } else if (i === trimmed.length - 1) {
+        end = i + 1;
         break;
       }
     }
@@ -901,6 +845,8 @@ export default class ConstraintGenerator {
           return '&&';
         case Symbols.OR:
           return '||';
+        case Symbols.NOT:
+          return '!';
         default:
           return '';
       }
@@ -932,7 +878,7 @@ export default class ConstraintGenerator {
       let modelKeyWithPrefix = Symbols.MODEL_PREFIX + modelKey;
       message = message.replace(
         modelKeyWithPrefix,
-        ConstraintGenerator.getObjectValue(model, modelKey)
+        ConstraintGenerator.getObjectValue(model, modelKey, true)
       );
     }
 
@@ -940,7 +886,7 @@ export default class ConstraintGenerator {
       let stateKeyWithPrefix = Symbols.STATE_PREFIX + stateKey;
       message = message.replace(
         stateKeyWithPrefix,
-        ConstraintGenerator.getObjectValue(state, stateKey)
+        ConstraintGenerator.getObjectValue(state, stateKey, true)
       );
     }
 

@@ -6,16 +6,16 @@ import {Evaluation} from './ConstraintSystem';
  */
 export interface ConstraintData {
   assertion: string;
-  message: string;
+  message?: string;
 }
 
 /**
  * Represents a single constraint, with specified model and state data types.
  */
 export default class Constraint<T extends ConstraintData, M, S> {
+  private readonly generator: ConstraintGenerator;
   private readonly assertionFunction: Function;
   private readonly resource: T;
-  private readonly generator: ConstraintGenerator;
 
   /**
    * Create a new constraint from constraint data.
@@ -40,7 +40,7 @@ export default class Constraint<T extends ConstraintData, M, S> {
     let consistent = this.assertionFunction.apply(data, null);
     return {
       consistent: consistent,
-      message: consistent
+      message: consistent || !this.resource.message
         ? ''
         : this.generator.getMessage(
             this.resource.message,
