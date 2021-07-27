@@ -5,7 +5,7 @@ import {Evaluation} from './ConstraintSystem';
  * This is the minimum amount of data needed to generate and evaluate a constraint.
  */
 export interface ConstraintData {
-  assertion: string;
+  constraint: string;
   message?: string;
 }
 

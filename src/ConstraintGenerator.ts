@@ -381,15 +381,15 @@ export default class ConstraintGenerator {
       console.log('Starting constraint generation with data: ', resource);
     }
 
-    let assertion = resource.assertion;
-    let tokens = this.getSplitTokens(assertion);
+    let constraint = resource.constraint;
+    let tokens = this.getSplitTokens(constraint);
 
     let activationToken = tokens[0].trim();
-    let conditionToken = tokens[1].trim();
+    let assertionToken = tokens[1].trim();
 
     if (Config.DEBUG_LOG) {
       console.log('Activation token: ', activationToken);
-      console.log('Condition token: ', conditionToken);
+      console.log('Assertion token: ', assertionToken);
     }
 
     let activationString = 'false';
@@ -404,8 +404,8 @@ export default class ConstraintGenerator {
       activationString = `this.functions['${activationToken}'](this.model,this.state)`;
     }
 
-    let conditionString = this.generateConditionalString(conditionToken);
-    let functionString = `if(${activationString}){return(${conditionString});}else{return(true);}`;
+    let assertionString = this.generateConditionalString(assertionToken);
+    let functionString = `if(${activationString}){return(${assertionString});}else{return(true);}`;
 
     if (Config.DEBUG_LOG) {
       console.log('Generated constraint: ', functionString);
