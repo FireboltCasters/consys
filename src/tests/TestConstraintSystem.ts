@@ -18,34 +18,34 @@ const state: State = {
 };
 const constraintData = [
   {
-    assertion:
+    constraint:
       "ALWAYS: LENGTH($time) && LENGTH(#currentTime) && LENGTH('Test') < $maxLength",
     message: 'failed0',
     id: 0,
   },
   {
-    assertion:
+    constraint:
       "WHEN(LENGTH('Test') == 4): LENGTH($time) - LENGTH(#currentTime) == ZERO",
     message: 'failed1',
     id: 1,
   },
   {
-    assertion: "ALWAYS: $time == '5:00'",
+    constraint: "ALWAYS: $time == '5:00'",
     message: 'failed2',
     id: 2,
   },
   {
-    assertion:
+    constraint:
       "ALWAYS: (1.3 < 1.5 && 3 <= 3) || (4.5 == 4.5 && 3 != 4) || !(LENGTH('Test') >= LENGTH('Test')) || (2 > 1)",
   },
   {
-    assertion:
+    constraint:
       'ALWAYS: ((2 + 3) * (4 / 2)) % 2 == 0 && (ADD(1, ADD(1, ADD(1, 1))) == $maxLength)',
   },
 ];
 
 const myConstraint = {
-  assertion: 'ALWAYS: SUB(4, 2) == 2 && PRINT_OBJECT($)',
+  constraint: 'ALWAYS: SUB(4, 2) == 2 && PRINT_OBJECT($)',
 };
 
 class MyPlugin extends ConSys.Plugin<Model, State> {
