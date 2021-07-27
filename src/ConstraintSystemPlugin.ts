@@ -4,7 +4,6 @@ import ConstraintSystem from './ConstraintSystem';
  * This is the basic API for a custom constraint system plugin with client defined constraints and functions.
  */
 export default abstract class ConstraintSystemPlugin<M, S> {
-
   /**
    * All constraints must be registered in this function.
    *

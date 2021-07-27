@@ -1,5 +1,5 @@
 import * as ConSys from '../index';
-import Config from "../Config";
+import Config from '../Config';
 
 type Model = {
   time: string;
@@ -18,38 +18,46 @@ const state: State = {
 };
 const constraintData = [
   {
-    assertion: "ALWAYS: LENGTH($time) && LENGTH(#currentTime) && LENGTH('Test') < $maxLength",
+    assertion:
+      "ALWAYS: LENGTH($time) && LENGTH(#currentTime) && LENGTH('Test') < $maxLength",
     message: 'failed0',
-    id: 0
+    id: 0,
   },
   {
-    assertion: "WHEN(LENGTH('Test') == 4): LENGTH($time) - LENGTH(#currentTime) == ZERO",
+    assertion:
+      "WHEN(LENGTH('Test') == 4): LENGTH($time) - LENGTH(#currentTime) == ZERO",
     message: 'failed1',
-    id: 1
+    id: 1,
   },
   {
     assertion: "ALWAYS: $time == '5:00'",
     message: 'failed2',
-    id: 2
+    id: 2,
   },
   {
-    assertion: "ALWAYS: (1.3 < 1.5 && 3 <= 3) || (4.5 == 4.5 && 3 != 4) || !(LENGTH('Test') >= LENGTH('Test')) || (2 > 1)"
+    assertion:
+      "ALWAYS: (1.3 < 1.5 && 3 <= 3) || (4.5 == 4.5 && 3 != 4) || !(LENGTH('Test') >= LENGTH('Test')) || (2 > 1)",
   },
   {
-    assertion: "ALWAYS: ((2 + 3) * (4 / 2)) % 2 == 0 && (ADD(1, ADD(1, ADD(1, 1))) == $maxLength)"
+    assertion:
+      'ALWAYS: ((2 + 3) * (4 / 2)) % 2 == 0 && (ADD(1, ADD(1, ADD(1, 1))) == $maxLength)',
   },
 ];
 
 const myConstraint = {
-  assertion: "ALWAYS: SUB(4, 2) == 2 && PRINT_OBJECT($)"
+  assertion: 'ALWAYS: SUB(4, 2) == 2 && PRINT_OBJECT($)',
 };
 
 class MyPlugin extends ConSys.Plugin<Model, State> {
-  async registerConstraints(system: ConSys.ConstraintSystem<Model, State>): Promise<void> {
+  async registerConstraints(
+    system: ConSys.ConstraintSystem<Model, State>
+  ): Promise<void> {
     system.addConstraint(myConstraint);
   }
 
-  async registerFunctions(system: ConSys.ConstraintSystem<Model, State>): Promise<void> {
+  async registerFunctions(
+    system: ConSys.ConstraintSystem<Model, State>
+  ): Promise<void> {
     system.addFunction('SUB', (a: number, b: number) => {
       return a - b;
     });
@@ -64,7 +72,6 @@ class MyPlugin extends ConSys.Plugin<Model, State> {
  * Testing all constraint system functions.
  */
 test('ConstraintSystem Test', async () => {
-
   /**
    * Custom constraint system plugin.
    */
@@ -125,16 +132,14 @@ test('ConstraintSystem Test', async () => {
         'Length is 4.5, is it?'
       );
       expect(system.getMessage('Length is ZERO, is it?', model, state)).toBe(
-          'Length is 0, is it?'
+        'Length is 0, is it?'
       );
-      expect(system.getMessage('Length is ADD(3, ADD(2, 1)), is it?', model, state)).toBe(
-          'Length is 6, is it?'
-      );
-      expect(system.getMessage('$', model, state)).toBe(
-          JSON.stringify(model)
-      );
-      expect(system.getMessage('$unknown', model, state)).toBe("undefined");
-      expect(system.getMessage('$tim!e', model, state)).toBe("undefined");
+      expect(
+        system.getMessage('Length is ADD(3, ADD(2, 1)), is it?', model, state)
+      ).toBe('Length is 6, is it?');
+      expect(system.getMessage('$', model, state)).toBe(JSON.stringify(model));
+      expect(system.getMessage('$unknown', model, state)).toBe('undefined');
+      expect(system.getMessage('$tim!e', model, state)).toBe('undefined');
     }
   }
 
@@ -146,10 +151,14 @@ test('ConstraintSystem Test', async () => {
   Config.DEBUG_LOG = true;
   await system.registerPlugin(new MyPlugin());
 
-  const report0 = system.evaluate([model], state, "inconsistent");
-  const report1 = system.evaluate(model, state, "consistent");
-  const report2 = system.evaluate(model, state, "all");
-  const report3 = system.evaluate(model, state, (evaluation) => evaluation.resource.id === 0);
+  const report0 = system.evaluate([model], state, 'inconsistent');
+  const report1 = system.evaluate(model, state, 'consistent');
+  const report2 = system.evaluate(model, state, 'all');
+  const report3 = system.evaluate(
+    model,
+    state,
+    evaluation => evaluation.resource.id === 0
+  );
   const report4 = system.evaluate(model, state);
 
   expect(report0[0].evaluation.length).toBe(1);

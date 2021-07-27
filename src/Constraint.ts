@@ -40,14 +40,15 @@ export default class Constraint<T extends ConstraintData, M, S> {
     let consistent = this.assertionFunction.apply(data, null);
     return {
       consistent: consistent,
-      message: consistent || !this.resource.message
-        ? ''
-        : this.generator.getMessage(
-            this.resource.message,
-            data.model,
-            data.state,
-            data.functions
-          ),
+      message:
+        consistent || !this.resource.message
+          ? ''
+          : this.generator.getMessage(
+              this.resource.message,
+              data.model,
+              data.state,
+              data.functions
+            ),
       resource: this.resource,
     };
   }
