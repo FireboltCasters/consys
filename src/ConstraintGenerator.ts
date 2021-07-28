@@ -243,33 +243,56 @@ export default class ConstraintGenerator {
   }
 
   /**
-   * Cuts off the end of a string, until a given regex is reached.
+   * For a possible function token, return the start and end index of that function or -1 if not a function.
    *
-   * @param srcString string to be cut
-   * @param charRegex stop regex
+   * @param srcString string to be parsed
+   * @param startIndex parenthesis start
+   * @private
    */
-  cutRemainderUntilCharMatches(srcString: string, charRegex: RegExp): string {
-    let endIndex = srcString.length - 1;
-    let char = srcString.charAt(endIndex);
-    while (!char.match(charRegex) && endIndex > 0) {
-      char = srcString.charAt(--endIndex);
+  private getFunctionIndexRange(srcString: string, startIndex: number): [number, number] {
+    let functionStart = startIndex;
+    for (let i = startIndex - 1; i >= 0; i--) {
+      let char = srcString.charAt(i);
+      if (!char.match(/[A-Za-z]|_/g)) {
+        functionStart = i + 1;
+        break;
+      }
+      if (i === 0) {
+        functionStart = 0;
+      }
     }
-    return srcString.substring(0, endIndex + 1);
+
+    // could be a function
+    let name = srcString.substring(functionStart, startIndex);
+    if (!this.customFunctions.includes(name)) {
+      return [-1, -1];
+    }
+
+    // now we can be certain it is a registered function, so find the enclosing parenthesis
+    let functionEnd = ConstraintGenerator.getFunctionEndIndex(srcString, functionStart, startIndex);
+    return [functionStart, functionEnd];
   }
 
   /**
-   * Cuts off the front of a string, until a given regex is reached.
+   * For a possible statement, return the start and end index of that statement, or -1 if not a statement.
    *
-   * @param srcString string to be cut
-   * @param charRegex stop regex
+   * @param srcString string to be parsed
+   * @param startIndex character start
+   * @private
    */
-  cutFrontUntilCharMatches(srcString: string, charRegex: RegExp): string {
-    let startIndex = 0;
-    let char = srcString.charAt(startIndex);
-    while (!char.match(charRegex) && startIndex < srcString.length - 1) {
-      char = srcString.charAt(++startIndex);
+  private getStatementIndexRange(srcString: string, startIndex: number): [number, number] {
+    let endIndex = ConstraintGenerator.getStatementEndIndex(srcString, startIndex, startIndex);
+
+    // this is not a statement, but a function
+    if (endIndex < srcString.length - 1 && srcString.charAt(endIndex) === Symbols.BRACKET_OPEN) {
+      return [-1, endIndex];
     }
-    return srcString.substring(startIndex);
+
+    let name = srcString.substring(startIndex, endIndex);
+    if (!this.customFunctions.includes(name)) {
+      return [-1, endIndex];
+    }
+    return [startIndex, endIndex];
   }
 
   /**
@@ -283,64 +306,32 @@ export default class ConstraintGenerator {
     }
 
     let res: string[] = [];
-    let tokenStart = 0;
-    for (let i = 0; i < srcString.length - 1; i++) {
+    for (let i = 0; i < srcString.length; i++) {
       let char = srcString.charAt(i);
-      let nextChar = srcString.charAt(i + 1);
 
-      // start of a word that is not the argument of a function call
-      if (
-        char.match(/\s/g) &&
-        nextChar.match(/^(?!.*\s).*$/g) &&
-        !this.isCharWithinFunction(srcString, i)
-      ) {
-        tokenStart = i + 1;
-      }
-
-      // we have the end of a word that is not an argument of a function call
-      if (
-        char.match(/^(?!.*\s).*$/g) &&
-        nextChar.match(/\s/g) &&
-        !this.isCharWithinFunction(srcString, i)
-      ) {
-        res.push(srcString.substring(tokenStart, i + 1));
-      }
-
-      if (i === srcString.length - 2) {
-        res.push(srcString.substring(tokenStart, i + 2));
+      if (!this.isCharWithinFunction(srcString, i) && (char === Symbols.MODEL_PREFIX || char === Symbols.STATE_PREFIX)) {
+        let endIndex = ConstraintGenerator.getDataAccessEndIndex(srcString, i, i);
+        res.push(srcString.substring(i, endIndex));
+        i = endIndex;
+      } else if (char === Symbols.BRACKET_OPEN) {
+        let [start, end] = this.getFunctionIndexRange(srcString, i);
+        if (start >= 0 && end >= 0) {
+          res.push(srcString.substring(start, end));
+          i = end;
+        }
+      } else if (!!char.match(/[A-Za-z]|_/g)) {
+        // could be a statement
+        let [start, end] = this.getStatementIndexRange(srcString, i);
+        if (start >= 0) {
+          res.push(srcString.substring(start, end));
+        }
+        if (end > i + 1) {
+          i = end - 1;
+        }
       }
     }
 
-    this.cutTokens(res);
     return res;
-  }
-
-  /**
-   * Trims front and back of string tokens.
-   *
-   * @param tokens tokens to be trimmed
-   * @private
-   */
-  private cutTokens(tokens: string[]) {
-    let modelRegex = new RegExp('\\' + Symbols.MODEL_PREFIX, 'g');
-    let stateRegex = new RegExp('\\' + Symbols.STATE_PREFIX, 'g');
-
-    for (let i = 0; i < tokens.length; i++) {
-      let token = tokens[i];
-      if (this.isStatementToken(token)) {
-        tokens[i] = this.cutRemainderUntilCharMatches(token, /\w/g);
-      } else if (this.isFunctionToken(token)) {
-        tokens[i] = this.cutRemainderUntilCharMatches(token, /\)/g);
-      } else if (token.includes(Symbols.MODEL_PREFIX)) {
-        let trimmed = this.cutRemainderUntilCharMatches(token, /\w/g);
-        trimmed = this.cutFrontUntilCharMatches(trimmed, modelRegex);
-        tokens[i] = trimmed;
-      } else if (token.includes(Symbols.STATE_PREFIX)) {
-        let trimmed = this.cutRemainderUntilCharMatches(token, /\w/g);
-        trimmed = this.cutFrontUntilCharMatches(trimmed, stateRegex);
-        tokens[i] = trimmed;
-      }
-    }
   }
 
   /**
@@ -805,6 +796,12 @@ export default class ConstraintGenerator {
     return `this.functions['${funName}'](${argSymbols})`;
   }
 
+  /**
+   * For a given token, replace it with the correct javascript syntax.
+   *
+   * @param token token to be replaced
+   * @private
+   */
   private getSymbolForToken(token: string): string {
     if (ConstraintGenerator.isModelVariable(token)) {
       if (token.length === 1) {
@@ -882,6 +879,8 @@ export default class ConstraintGenerator {
   ): string {
     let message = msgString.slice();
     let tokens = this.getMessageTokens(message);
+
+    console.log("tokens: ", tokens);
 
     let modelKeys = this.getFilteredTokenArray(tokens, Symbols.MODEL_PREFIX);
     let stateKeys = this.getFilteredTokenArray(tokens, Symbols.STATE_PREFIX);
