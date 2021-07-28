@@ -429,7 +429,7 @@ export default class ConstraintGenerator {
       console.log('Assertion token: ', assertionToken);
     }
 
-    let activationString = 'false';
+    let activationString;
 
     if (activationToken.startsWith(Symbols.ALWAYS)) {
       activationString = 'true';
