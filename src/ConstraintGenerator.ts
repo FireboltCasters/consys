@@ -249,7 +249,10 @@ export default class ConstraintGenerator {
    * @param startIndex parenthesis start
    * @private
    */
-  private getFunctionIndexRange(srcString: string, startIndex: number): [number, number] {
+  private getFunctionIndexRange(
+    srcString: string,
+    startIndex: number
+  ): [number, number] {
     let functionStart = startIndex;
     for (let i = startIndex - 1; i >= 0; i--) {
       let char = srcString.charAt(i);
@@ -269,7 +272,11 @@ export default class ConstraintGenerator {
     }
 
     // now we can be certain it is a registered function, so find the enclosing parenthesis
-    let functionEnd = ConstraintGenerator.getFunctionEndIndex(srcString, functionStart, startIndex);
+    let functionEnd = ConstraintGenerator.getFunctionEndIndex(
+      srcString,
+      functionStart,
+      startIndex
+    );
     return [functionStart, functionEnd];
   }
 
@@ -280,11 +287,21 @@ export default class ConstraintGenerator {
    * @param startIndex character start
    * @private
    */
-  private getStatementIndexRange(srcString: string, startIndex: number): [number, number] {
-    let endIndex = ConstraintGenerator.getStatementEndIndex(srcString, startIndex, startIndex);
+  private getStatementIndexRange(
+    srcString: string,
+    startIndex: number
+  ): [number, number] {
+    let endIndex = ConstraintGenerator.getStatementEndIndex(
+      srcString,
+      startIndex,
+      startIndex
+    );
 
     // this is not a statement, but a function
-    if (endIndex < srcString.length - 1 && srcString.charAt(endIndex) === Symbols.BRACKET_OPEN) {
+    if (
+      endIndex < srcString.length - 1 &&
+      srcString.charAt(endIndex) === Symbols.BRACKET_OPEN
+    ) {
       return [-1, endIndex];
     }
 
@@ -309,8 +326,15 @@ export default class ConstraintGenerator {
     for (let i = 0; i < srcString.length; i++) {
       let char = srcString.charAt(i);
 
-      if (!this.isCharWithinFunction(srcString, i) && (char === Symbols.MODEL_PREFIX || char === Symbols.STATE_PREFIX)) {
-        let endIndex = ConstraintGenerator.getDataAccessEndIndex(srcString, i, i);
+      if (
+        !this.isCharWithinFunction(srcString, i) &&
+        (char === Symbols.MODEL_PREFIX || char === Symbols.STATE_PREFIX)
+      ) {
+        let endIndex = ConstraintGenerator.getDataAccessEndIndex(
+          srcString,
+          i,
+          i
+        );
         res.push(srcString.substring(i, endIndex));
         i = endIndex;
       } else if (char === Symbols.BRACKET_OPEN) {
@@ -880,7 +904,7 @@ export default class ConstraintGenerator {
     let message = msgString.slice();
     let tokens = this.getMessageTokens(message);
 
-    console.log("tokens: ", tokens);
+    console.log('tokens: ', tokens);
 
     let modelKeys = this.getFilteredTokenArray(tokens, Symbols.MODEL_PREFIX);
     let stateKeys = this.getFilteredTokenArray(tokens, Symbols.STATE_PREFIX);
