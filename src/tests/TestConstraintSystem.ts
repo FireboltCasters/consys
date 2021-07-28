@@ -145,13 +145,29 @@ test('ConstraintSystem Test', async () => {
       expect(system.getMessage('$', model, state)).toBe(JSON.stringify(model));
       expect(system.getMessage('$unknown', model, state)).toBe('undefined');
       expect(system.getMessage('$tim!e', model, state)).toBe('undefined!e');
-      expect(system.getMessage(',$maxLength, right?', model, state)).toBe(',10, right?');
+      expect(system.getMessage(',$maxLength, right?', model, state)).toBe(
+        ',10, right?'
+      );
       expect(system.getMessage('a$maxLength,', model, state)).toBe('a10,');
       expect(system.getMessage(',#currentTime,', model, state)).toBe(',4:00,');
       expect(system.getMessage('a#currentTime,', model, state)).toBe('a4:00,');
-      expect(system.getMessage("%$maxLength~#currentTime,LENGTH('Four')!ZERO@", model, state)).toBe("%10~4:00,4!0@");
-      expect(system.getMessage("Test*ADD(ADD(3,10), 3)/Test", model, state)).toBe("Test*16/Test");
-      expect(system.getMessage("LENGTH('Test')? or $maxLength:LENGTH(#currentTime)", model, state)).toBe("4? or 10:4");
+      expect(
+        system.getMessage(
+          "%$maxLength~#currentTime,LENGTH('Four')!ZERO@",
+          model,
+          state
+        )
+      ).toBe('%10~4:00,4!0@');
+      expect(
+        system.getMessage('Test*ADD(ADD(3,10), 3)/Test', model, state)
+      ).toBe('Test*16/Test');
+      expect(
+        system.getMessage(
+          "LENGTH('Test')? or $maxLength:LENGTH(#currentTime)",
+          model,
+          state
+        )
+      ).toBe('4? or 10:4');
     }
   }
 
