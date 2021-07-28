@@ -1,7 +1,6 @@
 <h1><a href="https://www.npmjs.com/package/consys"><img src="https://user-images.githubusercontent.com/37511270/127232757-a7fcfdbf-44d1-429a-8531-41a3d0d9e40d.png" width="50" heigth="50" /></a><a href="https://www.npmjs.com/package/consys">consys</a> - flexible model-constraint checking</h1>
 
 <p align="left">
-  <a href="https://github.com/marketplace/actions/lint-action"><img src="https://img.shields.io/badge/uses-Lint%20Action-blue.svg"/></a>
   <a href="https://badge.fury.io/js/consys.svg"><img src="https://badge.fury.io/js/consys.svg" alt="npm package" /></a>
   <a href="https://img.shields.io/github/license/FireboltCasters/consys"><img src="https://img.shields.io/github/license/FireboltCasters/consys" alt="MIT" /></a>
   <a href="https://img.shields.io/github/last-commit/FireboltCasters/consys?logo=git"><img src="https://img.shields.io/github/last-commit/FireboltCasters/consys?logo=git" alt="last commit" /></a>
@@ -93,7 +92,7 @@ let evaluation: ConSys.Evaluation = report.evaluation[0];
 console.log(evaluation.message);
 ```
 
-For a more detailed look into all of the features, including the assertion syntax, custom functions, plugins and more, please have a look into the [wiki](https://github.com/FireboltCasters/consys/wiki).
+For a more detailed look into all of the features, including the constraint syntax, custom functions, plugins and more, please have a look into the [wiki](https://github.com/FireboltCasters/consys/wiki).
 
 ## Contributors
 
