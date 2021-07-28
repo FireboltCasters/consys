@@ -249,7 +249,10 @@ export default class ConstraintGenerator {
    * @param startIndex parenthesis start
    * @private
    */
-  private getFunctionIndexRange(srcString: string, startIndex: number): [number, number] {
+  private getFunctionIndexRange(
+    srcString: string,
+    startIndex: number
+  ): [number, number] {
     let functionStart = startIndex;
     for (let i = startIndex - 1; i >= 0; i--) {
       let char = srcString.charAt(i);
@@ -269,7 +272,11 @@ export default class ConstraintGenerator {
     }
 
     // now we can be certain it is a registered function, so find the enclosing parenthesis
-    let functionEnd = ConstraintGenerator.getFunctionEndIndex(srcString, functionStart, startIndex);
+    let functionEnd = ConstraintGenerator.getFunctionEndIndex(
+      srcString,
+      functionStart,
+      startIndex
+    );
     return [functionStart, functionEnd];
   }
 
@@ -280,11 +287,21 @@ export default class ConstraintGenerator {
    * @param startIndex character start
    * @private
    */
-  private getStatementIndexRange(srcString: string, startIndex: number): [number, number] {
-    let endIndex = ConstraintGenerator.getStatementEndIndex(srcString, startIndex, startIndex);
+  private getStatementIndexRange(
+    srcString: string,
+    startIndex: number
+  ): [number, number] {
+    let endIndex = ConstraintGenerator.getStatementEndIndex(
+      srcString,
+      startIndex,
+      startIndex
+    );
 
     // this is not a statement, but a function
-    if (endIndex < srcString.length - 1 && srcString.charAt(endIndex) === Symbols.BRACKET_OPEN) {
+    if (
+      endIndex < srcString.length - 1 &&
+      srcString.charAt(endIndex) === Symbols.BRACKET_OPEN
+    ) {
       return [-1, endIndex];
     }
 
@@ -303,8 +320,16 @@ export default class ConstraintGenerator {
    * @param currentIndex start index
    * @private
    */
-  private static handleAddDataAccessToken(srcString: string, res: string[], currentIndex: number): number {
-    let endIndex = ConstraintGenerator.getDataAccessEndIndex(srcString, currentIndex, currentIndex);
+  private static handleAddDataAccessToken(
+    srcString: string,
+    res: string[],
+    currentIndex: number
+  ): number {
+    let endIndex = ConstraintGenerator.getDataAccessEndIndex(
+      srcString,
+      currentIndex,
+      currentIndex
+    );
     res.push(srcString.substring(currentIndex, endIndex));
     return endIndex;
   }
@@ -317,7 +342,11 @@ export default class ConstraintGenerator {
    * @param currentIndex start index
    * @private
    */
-  private handleAddFunctionToken(srcString: string, res: string[], currentIndex: number): number {
+  private handleAddFunctionToken(
+    srcString: string,
+    res: string[],
+    currentIndex: number
+  ): number {
     let [start, end] = this.getFunctionIndexRange(srcString, currentIndex);
     if (start >= 0 && end >= 0) {
       res.push(srcString.substring(start, end));
@@ -334,7 +363,11 @@ export default class ConstraintGenerator {
    * @param currentIndex start index
    * @private
    */
-  private handleAddStatementToken(srcString: string, res: string[], currentIndex: number): number {
+  private handleAddStatementToken(
+    srcString: string,
+    res: string[],
+    currentIndex: number
+  ): number {
     let [start, end] = this.getStatementIndexRange(srcString, currentIndex);
     if (start >= 0) {
       res.push(srcString.substring(start, end));
@@ -360,19 +393,28 @@ export default class ConstraintGenerator {
     while (currentIndex < srcString.length) {
       let char = srcString.charAt(currentIndex);
 
-      if (!this.isCharWithinFunction(srcString, currentIndex) &&
-          (char === Symbols.MODEL_PREFIX || char === Symbols.STATE_PREFIX)) {
-
-        currentIndex = ConstraintGenerator.handleAddDataAccessToken(srcString, res, currentIndex);
-
+      if (
+        !this.isCharWithinFunction(srcString, currentIndex) &&
+        (char === Symbols.MODEL_PREFIX || char === Symbols.STATE_PREFIX)
+      ) {
+        currentIndex = ConstraintGenerator.handleAddDataAccessToken(
+          srcString,
+          res,
+          currentIndex
+        );
       } else if (char === Symbols.BRACKET_OPEN) {
-
-        currentIndex = this.handleAddFunctionToken(srcString, res, currentIndex);
-
+        currentIndex = this.handleAddFunctionToken(
+          srcString,
+          res,
+          currentIndex
+        );
       } else if (!!char.match(/[A-Za-z]|_/g)) {
-
         // could be a statement
-        currentIndex = this.handleAddStatementToken(srcString, res, currentIndex);
+        currentIndex = this.handleAddStatementToken(
+          srcString,
+          res,
+          currentIndex
+        );
       }
 
       currentIndex++;
@@ -440,7 +482,7 @@ export default class ConstraintGenerator {
     } else if (this.isStatementToken(activationToken)) {
       activationString = `this.functions['${activationToken}'](this.model,this.state)`;
     } else {
-      throw Error("Invalid syntax in constraint: " + constraint);
+      throw Error('Invalid syntax in constraint: ' + constraint);
     }
 
     let assertionString = this.generateConditionalString(assertionToken);
@@ -453,7 +495,7 @@ export default class ConstraintGenerator {
     try {
       return FunctionGenerator.generateFromString(functionString);
     } catch (error) {
-      throw Error("Invalid syntax in constraint: " + constraint);
+      throw Error('Invalid syntax in constraint: ' + constraint);
     }
   }
 
@@ -910,7 +952,7 @@ export default class ConstraintGenerator {
         case Symbols.NOT:
           return '!';
         default:
-          throw Error("Invalid token in constraint: " + token);
+          throw Error('Invalid token in constraint: ' + token);
       }
     }
   }
