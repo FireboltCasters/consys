@@ -213,39 +213,49 @@ test('ConstraintSystem Test', async () => {
   expect(evaluation.consistent).toBe(false);
 
   const constraint0 = {
-    constraint: "TRUE: FALSE",
-    message: "$"
+    constraint: 'TRUE: FALSE',
+    message: '$',
   };
 
   system.addConstraint(constraint0);
   let rep = system.evaluate(model, state, (evaluation: ConSys.Evaluation) => {
-    return evaluation.resource.constraint === "TRUE: FALSE";
+    return evaluation.resource.constraint === 'TRUE: FALSE';
   });
   expect(rep[0].evaluation.length).toBe(1);
   expect(rep[0].evaluation[0].message).toBe(JSON.stringify(model));
 
-  expect(() => system.addConstraint({
-    constraint: ""
-  })).toThrowError();
+  expect(() =>
+    system.addConstraint({
+      constraint: '',
+    })
+  ).toThrowError();
 
-  expect(() => system.addConstraint({
-    constraint: "ALAYS: TRUE"
-  })).toThrowError();
+  expect(() =>
+    system.addConstraint({
+      constraint: 'ALAYS: TRUE',
+    })
+  ).toThrowError();
 
-  expect(() => system.addConstraint({
-    constraint: "ALWAYS: (3 * 3) =- 9"
-  })).toThrowError();
+  expect(() =>
+    system.addConstraint({
+      constraint: 'ALWAYS: (3 * 3) =- 9',
+    })
+  ).toThrowError();
 
-  expect(() => system.addConstraint({
-    constraint: "ALWAYS: ((3 * 3) == 9"
-  })).toThrowError();
+  expect(() =>
+    system.addConstraint({
+      constraint: 'ALWAYS: ((3 * 3) == 9',
+    })
+  ).toThrowError();
 
-  expect(() => system.addConstraint({
-    constraint: "ALWAYS: myFunc() == 9"
-  })).toThrowError();
+  expect(() =>
+    system.addConstraint({
+      constraint: 'ALWAYS: myFunc() == 9',
+    })
+  ).toThrowError();
 
   system.addConstraint({
-    constraint: "ALWAYS: MODEL_CHECK()"
+    constraint: 'ALWAYS: MODEL_CHECK()',
   });
 
   expect(() => system.evaluate(model, state)).toThrowError();
