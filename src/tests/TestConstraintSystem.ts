@@ -65,6 +65,8 @@ class MyPlugin extends ConSys.Plugin<Model, State> {
       console.log(object);
       return true;
     });
+    system.addStatement('TRUE', () => true);
+    system.addStatement('FALSE', () => false);
   }
 }
 
@@ -102,6 +104,9 @@ test('ConstraintSystem Test', async () => {
       });
       system.addFunction('ADD', (a: number, b: number) => {
         return a + b;
+      });
+      system.addStatement('MODEL_CHECK', (model: Model) => {
+        return model.maxLength === 10;
       });
       system.addStatement('ZERO', () => {
         return 0;
@@ -190,4 +195,42 @@ test('ConstraintSystem Test', async () => {
 
   expect(evaluation.message).toBe('failed0');
   expect(evaluation.consistent).toBe(false);
+
+  const constraint0 = {
+    constraint: "TRUE: FALSE",
+    message: "$"
+  };
+
+  system.addConstraint(constraint0);
+  let rep = system.evaluate(model, state, (evaluation: ConSys.Evaluation) => {
+    return evaluation.resource.constraint === "TRUE: FALSE";
+  });
+  expect(rep[0].evaluation.length).toBe(1);
+  expect(rep[0].evaluation[0].message).toBe(JSON.stringify(model));
+
+  expect(() => system.addConstraint({
+    constraint: ""
+  })).toThrowError();
+
+  expect(() => system.addConstraint({
+    constraint: "ALAYS: TRUE"
+  })).toThrowError();
+
+  expect(() => system.addConstraint({
+    constraint: "ALWAYS: (3 * 3) =- 9"
+  })).toThrowError();
+
+  expect(() => system.addConstraint({
+    constraint: "ALWAYS: ((3 * 3) == 9"
+  })).toThrowError();
+
+  expect(() => system.addConstraint({
+    constraint: "ALWAYS: myFunc() == 9"
+  })).toThrowError();
+
+  system.addConstraint({
+    constraint: "ALWAYS: MODEL_CHECK()"
+  });
+
+  expect(() => system.evaluate(model, state)).toThrowError();
 });

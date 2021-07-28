@@ -296,6 +296,56 @@ export default class ConstraintGenerator {
   }
 
   /**
+   * Adds a data access token from a string and returns the end index.
+   *
+   * @param srcString string to be parsed
+   * @param res result array
+   * @param currentIndex start index
+   * @private
+   */
+  private static handleAddDataAccessToken(srcString: string, res: string[], currentIndex: number): number {
+    let endIndex = ConstraintGenerator.getDataAccessEndIndex(srcString, currentIndex, currentIndex);
+    res.push(srcString.substring(currentIndex, endIndex));
+    return endIndex;
+  }
+
+  /**
+   * Adds a function token from a string and returns the end index.
+   *
+   * @param srcString string to be parsed
+   * @param res result array
+   * @param currentIndex start index
+   * @private
+   */
+  private handleAddFunctionToken(srcString: string, res: string[], currentIndex: number): number {
+    let [start, end] = this.getFunctionIndexRange(srcString, currentIndex);
+    if (start >= 0 && end >= 0) {
+      res.push(srcString.substring(start, end));
+      return end;
+    }
+    return currentIndex;
+  }
+
+  /**
+   * Adds a statement token from a string and returns the end index.
+   *
+   * @param srcString string to be parsed
+   * @param res result array
+   * @param currentIndex start index
+   * @private
+   */
+  private handleAddStatementToken(srcString: string, res: string[], currentIndex: number): number {
+    let [start, end] = this.getStatementIndexRange(srcString, currentIndex);
+    if (start >= 0) {
+      res.push(srcString.substring(start, end));
+    }
+    if (end > currentIndex + 1) {
+      return end - 1;
+    }
+    return currentIndex;
+  }
+
+  /**
    * Returns a tokenized version of a message string, split according to DSL syntax.
    *
    * @param srcString string to be tokenized
@@ -306,29 +356,26 @@ export default class ConstraintGenerator {
     }
 
     let res: string[] = [];
-    for (let i = 0; i < srcString.length; i++) {
-      let char = srcString.charAt(i);
+    let currentIndex = 0;
+    while (currentIndex < srcString.length) {
+      let char = srcString.charAt(currentIndex);
 
-      if (!this.isCharWithinFunction(srcString, i) && (char === Symbols.MODEL_PREFIX || char === Symbols.STATE_PREFIX)) {
-        let endIndex = ConstraintGenerator.getDataAccessEndIndex(srcString, i, i);
-        res.push(srcString.substring(i, endIndex));
-        i = endIndex;
+      if (!this.isCharWithinFunction(srcString, currentIndex) &&
+          (char === Symbols.MODEL_PREFIX || char === Symbols.STATE_PREFIX)) {
+
+        currentIndex = ConstraintGenerator.handleAddDataAccessToken(srcString, res, currentIndex);
+
       } else if (char === Symbols.BRACKET_OPEN) {
-        let [start, end] = this.getFunctionIndexRange(srcString, i);
-        if (start >= 0 && end >= 0) {
-          res.push(srcString.substring(start, end));
-          i = end;
-        }
+
+        currentIndex = this.handleAddFunctionToken(srcString, res, currentIndex);
+
       } else if (!!char.match(/[A-Za-z]|_/g)) {
+
         // could be a statement
-        let [start, end] = this.getStatementIndexRange(srcString, i);
-        if (start >= 0) {
-          res.push(srcString.substring(start, end));
-        }
-        if (end > i + 1) {
-          i = end - 1;
-        }
+        currentIndex = this.handleAddStatementToken(srcString, res, currentIndex);
       }
+
+      currentIndex++;
     }
 
     return res;
@@ -392,6 +439,8 @@ export default class ConstraintGenerator {
       activationString = this.generateConditionalString(activationData);
     } else if (this.isStatementToken(activationToken)) {
       activationString = `this.functions['${activationToken}'](this.model,this.state)`;
+    } else {
+      throw Error("Invalid syntax in constraint: " + constraint);
     }
 
     let assertionString = this.generateConditionalString(assertionToken);
@@ -401,7 +450,11 @@ export default class ConstraintGenerator {
       console.log('Generated constraint: ', functionString);
     }
 
-    return FunctionGenerator.generateFromString(functionString);
+    try {
+      return FunctionGenerator.generateFromString(functionString);
+    } catch (error) {
+      throw Error("Invalid syntax in constraint: " + constraint);
+    }
   }
 
   /**
@@ -857,7 +910,7 @@ export default class ConstraintGenerator {
         case Symbols.NOT:
           return '!';
         default:
-          return '';
+          throw Error("Invalid token in constraint: " + token);
       }
     }
   }
@@ -879,8 +932,6 @@ export default class ConstraintGenerator {
   ): string {
     let message = msgString.slice();
     let tokens = this.getMessageTokens(message);
-
-    console.log("tokens: ", tokens);
 
     let modelKeys = this.getFilteredTokenArray(tokens, Symbols.MODEL_PREFIX);
     let stateKeys = this.getFilteredTokenArray(tokens, Symbols.STATE_PREFIX);

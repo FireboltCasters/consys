@@ -37,20 +37,28 @@ export default class Constraint<T extends ConstraintData, M, S> {
   evaluate<
     D extends {model: M; state: S; functions: {[key: string]: Function}}
   >(data: D): Evaluation {
-    let consistent = this.assertionFunction.apply(data, null);
-    return {
-      consistent: consistent,
-      message:
-        consistent || !this.resource.message
-          ? ''
-          : this.generator.getMessage(
-              this.resource.message,
-              data.model,
-              data.state,
-              data.functions
-            ),
-      resource: this.resource,
-    };
+    try {
+      let consistent = this.assertionFunction.apply(data, null);
+      return {
+        consistent: consistent,
+        message:
+            consistent || !this.resource.message
+                ? ''
+                : this.generator.getMessage(
+                    this.resource.message,
+                    data.model,
+                    data.state,
+                    data.functions
+                ),
+        resource: this.resource,
+      };
+    } catch (error) {
+      let errorObj = {
+        resource: this.resource,
+        func: String(this.assertionFunction),
+      };
+      throw Error("Invalid constraint function generated: " + JSON.stringify(errorObj));
+    }
   }
 
   /**
