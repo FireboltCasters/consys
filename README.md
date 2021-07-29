@@ -92,6 +92,8 @@ let evaluation: ConSys.Evaluation = report.evaluation[0];
 console.log(evaluation.message);
 ```
 
+## Documentation
+
 For a more detailed look into all of the features, including the constraint syntax, custom functions, plugins and more, please have a look into the [wiki](https://github.com/FireboltCasters/consys/wiki).
 
 ## Contributors
