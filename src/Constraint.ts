@@ -1,5 +1,5 @@
 import ConstraintGenerator from './ConstraintGenerator';
-import {ConstraintData, Evaluation} from "./Types";
+import {ConstraintData, Evaluation} from './Types';
 
 /**
  * Represents a single constraint, with specified model and state data types.
