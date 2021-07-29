@@ -1,4 +1,4 @@
-import {ConstraintData} from './Constraint';
+import {ConstraintData} from './Types';
 import FunctionGenerator from './ignoreCoverage/FunctionGenerator';
 import Config from './Config';
 import {Symbols} from './Symbols';

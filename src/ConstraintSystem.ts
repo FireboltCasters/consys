@@ -1,47 +1,23 @@
-import Constraint, {ConstraintData} from './Constraint';
 import ConstraintGenerator from './ConstraintGenerator';
 import ConstraintSystemPlugin from './ConstraintSystemPlugin';
 import Config from './Config';
-
-/**
- * Evaluation data for a single constraint.
- */
-export interface Evaluation {
-  consistent: boolean;
-  message: string;
-  resource: any;
-}
-
-/**
- * Evaluation report, used as the API for the client application.
- */
-export interface Report<M, S> {
-  checkedModel: M;
-  checkedState: S;
-  checkedConstraints: ConstraintData[];
-  evaluation: Evaluation[];
-}
-
-/**
- * Filter function for evaluations.
- */
-export type EvaluationFilterFunction = (evaluation: Evaluation) => boolean;
-
-/**
- * Filter type for filtering evaluations.
- */
-export type EvaluationFilter =
-  | 'all'
-  | 'consistent'
-  | 'inconsistent'
-  | EvaluationFilterFunction;
+import {
+  ConstraintData,
+  Evaluation,
+  EvaluationFilerFunction,
+  EvaluationFilter,
+  FunctionType,
+  Report,
+  StatementType
+} from "./Types";
+import Constraint from "./Constraint";
 
 /**
  * A constraint system with multiple constraints and custom functions, defined for specific model and state types.
  */
 export default class ConstraintSystem<M, S> {
   private readonly generator: ConstraintGenerator = new ConstraintGenerator();
-  private readonly constraints: Constraint<ConstraintData, M, S>[] = [];
+  private readonly constraints: Constraint<M, S>[] = [];
   private readonly functions: {[key: string]: Function} = {};
 
   /**
@@ -52,7 +28,7 @@ export default class ConstraintSystem<M, S> {
    */
   private static getFilterFunction(
     evaluationFilter: EvaluationFilter
-  ): EvaluationFilterFunction {
+  ): EvaluationFilerFunction {
     switch (evaluationFilter) {
       case 'all':
         return () => true;
@@ -61,7 +37,7 @@ export default class ConstraintSystem<M, S> {
       case 'inconsistent':
         return (evaluation: Evaluation) => !evaluation.consistent;
       default:
-        return evaluationFilter;
+        return (evaluation: Evaluation) => evaluationFilter(evaluation.resource);
     }
   }
 
@@ -83,7 +59,7 @@ export default class ConstraintSystem<M, S> {
    *
    * @param resource constraint data
    */
-  addConstraint<T extends ConstraintData>(resource: T) {
+  addConstraint(resource: ConstraintData) {
     this.constraints.push(new Constraint(resource, this.generator));
   }
 
@@ -93,7 +69,7 @@ export default class ConstraintSystem<M, S> {
    * @param name name of the function
    * @param fun custom function
    */
-  addFunction(name: string, fun: (...args: any[]) => any) {
+  addFunction(name: string, fun: FunctionType) {
     this.addFun(name, fun);
   }
 
@@ -103,7 +79,7 @@ export default class ConstraintSystem<M, S> {
    * @param name name of the statement
    * @param fun custom statement
    */
-  addStatement(name: string, fun: (model: M, state: S) => any) {
+  addStatement(name: string, fun: StatementType<M, S>) {
     this.addFun(name, fun);
   }
 

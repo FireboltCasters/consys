@@ -1,7 +1,8 @@
 /* istanbul ignore file */
 import Constraint from './Constraint';
-import ConstraintSystem, {Evaluation, Report} from './ConstraintSystem';
+import ConstraintSystem from './ConstraintSystem';
 import ConstraintSystemPlugin from './ConstraintSystemPlugin';
+import {Evaluation, Report} from "./Types";
 
 export {Constraint};
 export {ConstraintSystem};

@@ -1,5 +1,6 @@
 import * as ConSys from '../index';
 import Config from '../Config';
+import {ConstraintData} from "../Types";
 
 type Model = {
   time: string;
@@ -185,7 +186,7 @@ test('ConstraintSystem Test', async () => {
   const report3 = system.evaluate(
     model,
     state,
-    evaluation => evaluation.resource.id === 0
+    resource => resource.id === 0
   );
   const report4 = system.evaluate(model, state);
 
@@ -218,8 +219,8 @@ test('ConstraintSystem Test', async () => {
   };
 
   system.addConstraint(constraint0);
-  let rep = system.evaluate(model, state, (evaluation: ConSys.Evaluation) => {
-    return evaluation.resource.constraint === 'TRUE: FALSE';
+  let rep = system.evaluate(model, state, (resource: ConstraintData) => {
+    return resource.constraint === 'TRUE: FALSE';
   });
   expect(rep[0].evaluation.length).toBe(1);
   expect(rep[0].evaluation[0].message).toBe(JSON.stringify(model));

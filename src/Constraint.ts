@@ -1,21 +1,13 @@
 import ConstraintGenerator from './ConstraintGenerator';
-import {Evaluation} from './ConstraintSystem';
-
-/**
- * This is the minimum amount of data needed to generate and evaluate a constraint.
- */
-export interface ConstraintData {
-  constraint: string;
-  message?: string;
-}
+import {ConstraintData, Evaluation} from "./Types";
 
 /**
  * Represents a single constraint, with specified model and state data types.
  */
-export default class Constraint<T extends ConstraintData, M, S> {
+export default class Constraint<M, S> {
   private readonly generator: ConstraintGenerator;
   private readonly assertionFunction: Function;
-  private readonly resource: T;
+  private readonly resource: ConstraintData;
 
   /**
    * Create a new constraint from constraint data.
@@ -23,7 +15,7 @@ export default class Constraint<T extends ConstraintData, M, S> {
    * @param resource constraint data
    * @param generator constraint generator instance
    */
-  constructor(resource: T, generator: ConstraintGenerator) {
+  constructor(resource: ConstraintData, generator: ConstraintGenerator) {
     this.resource = resource;
     this.generator = generator;
     this.assertionFunction = this.generator.generateFunction(resource);
@@ -66,7 +58,7 @@ export default class Constraint<T extends ConstraintData, M, S> {
   /**
    * Returns the original resource that was used to generate this constraint.
    */
-  getResource(): T {
+  getResource(): ConstraintData {
     return this.resource;
   }
 }
