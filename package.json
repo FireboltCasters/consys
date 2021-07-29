@@ -57,6 +57,7 @@
   },
   "homepage": "https://github.com/FireboltCasters/consys#readme",
   "devDependencies": {
+    "@babel/preset-typescript": "^7.14.5",
     "@types/jest": "^26.0.23",
     "@types/node": "^16.0.0",
     "gts": "^3.1.0",
@@ -67,7 +68,5 @@
     "ts-node": "^10.0.0",
     "typescript": "^4.3.5"
   },
-  "dependencies": {
-    "@babel/preset-typescript": "^7.14.5"
-  }
+  "dependencies": {}
 }
