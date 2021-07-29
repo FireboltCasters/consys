@@ -31,7 +31,7 @@
 
 **consys** is a flexible tool to evaluate models using generic and readable constraints.
 
-- **Modern & Lightweight:** consys has full TypeScript support and uses little additional dependencies, so it can easily be integrated.
+- **Modern & Lightweight:** consys has full TypeScript support and uses no additional dependencies, so it can easily be integrated.
 - **Customizable:** Register custom functions and plugins, tailered to the application.
 - **Flexible:** Constraints are designed to be as flexible as possible, while still being readable.
 - **User friendly:** consys defines its own domain specific language to manage constraints, making it easy to read and fully generic.
