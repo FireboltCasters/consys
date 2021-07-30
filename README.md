@@ -58,23 +58,23 @@ type TableRow = {
 };
 
 // Now, lets create our constraint system
-const system = new ConSys.ConstraintSystem<TableRow, {}>();
+const rowConstraints = new ConSys.ConstraintSystem<TableRow, {}>();
 
 // For our constraint, lets choose a simple assertion that must always be true:
 // The age entry of our model should always be less than 21.
 // If that should not be the case, our custom message will be returned in the evaluation.
-system.addConstraint({
+rowConstraints.addConstraint({
   constraint: 'ALWAYS: $entryAge < 21',
   message: 'The current age is $entryAge, but it can not be greater than 20.',
 });
 
 // Before we can evaluate something though, we need to create a new instance of our model
-let model: TableRow = {
+let row: TableRow = {
   entryAge: 24,
 };
 
 // Lets evaluate our model instance
-let reports: ConSys.Report<TableRow, {}>[] = system.evaluate(model, {});
+let reports: ConSys.Report<TableRow, {}>[] = rowConstraints.evaluate(row, {});
 
 // We will get back an array of reports, but in our case there should only be one,
 // since we only evaluated one model instance
