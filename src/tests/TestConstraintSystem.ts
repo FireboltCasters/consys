@@ -5,6 +5,9 @@ import {ConstraintData} from "../Types";
 type Model = {
   time: string;
   maxLength: number;
+  nested: {
+    value: number;
+  }
 };
 type State = {
   currentTime: string;
@@ -13,6 +16,9 @@ type State = {
 const model: Model = {
   time: '5:00',
   maxLength: 4,
+  nested: {
+    value: 42
+  }
 };
 const state: State = {
   currentTime: '7:00',
@@ -32,6 +38,11 @@ const constraintData = [
   },
   {
     constraint: "ALWAYS: $time == '5:00'",
+    message: 'failed2',
+    id: 2,
+  },
+  {
+    constraint: "ALWAYS: $nested.value > 40",
     message: 'failed2',
     id: 2,
   },
@@ -121,6 +132,9 @@ test('ConstraintSystem Test', async () => {
       const model: Model = {
         time: '1:00',
         maxLength: 10,
+        nested: {
+          value: 42
+        }
       };
       const state: State = {
         currentTime: '4:00',
@@ -154,11 +168,11 @@ test('ConstraintSystem Test', async () => {
       expect(system.getMessage('a#currentTime,', model, state)).toBe('a4:00,');
       expect(
         system.getMessage(
-          "%$maxLength~#currentTime,LENGTH('Four')!ZERO@",
+          "%$maxLength~#currentTime,LENGTH('Four')!ZERO@$nested.value%",
           model,
           state
         )
-      ).toBe('%10~4:00,4!0@');
+      ).toBe('%10~4:00,4!0@42%');
       expect(
         system.getMessage('Test*ADD(ADD(3,10), 3)/Test', model, state)
       ).toBe('Test*16/Test');
@@ -191,7 +205,7 @@ test('ConstraintSystem Test', async () => {
   const report4 = system.evaluate(model, state);
 
   expect(report0[0].evaluation.length).toBe(1);
-  expect(report1[0].evaluation.length).toBe(5);
+  expect(report1[0].evaluation.length).toBe(6);
   expect(report2[0].evaluation.length).toBe(constraintData.length + 1);
   expect(report3[0].evaluation.length).toBe(1);
   expect(report4[0].evaluation.length).toBe(constraintData.length + 1);
