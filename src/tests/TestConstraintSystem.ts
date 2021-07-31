@@ -1,6 +1,6 @@
 import * as ConSys from '../index';
 import Config from '../Config';
-import {ConstraintData} from "../Types";
+import {ConstraintData} from '../Types';
 
 type Model = {
   time: string;
@@ -197,11 +197,7 @@ test('ConstraintSystem Test', async () => {
   const report0 = system.evaluate([model], state, 'inconsistent');
   const report1 = system.evaluate(model, state, 'consistent');
   const report2 = system.evaluate(model, state, 'all');
-  const report3 = system.evaluate(
-    model,
-    state,
-    resource => resource.id === 0
-  );
+  const report3 = system.evaluate(model, state, resource => resource.id === 0);
   const report4 = system.evaluate(model, state);
 
   expect(report0[0].evaluation.length).toBe(1);

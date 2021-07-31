@@ -31,7 +31,7 @@
 
 **consys** is a flexible tool to evaluate models using generic and readable constraints.
 
-- **Modern & Lightweight:** consys has full TypeScript support and uses little additional dependencies, so it can easily be integrated.
+- **Modern & Lightweight:** consys has full TypeScript support and uses no additional dependencies, so it can easily be integrated.
 - **Customizable:** Register custom functions and plugins, tailered to the application.
 - **Flexible:** Constraints are designed to be as flexible as possible, while still being readable.
 - **User friendly:** consys defines its own domain specific language to manage constraints, making it easy to read and fully generic.
@@ -50,7 +50,7 @@ After the installation, you can start using it. Here is a small example to get y
 
 ```typescript
 // First import the package
-import * as ConSys from 'consys';
+import * as consys from 'consys';
 
 // This is our simple model, with one age entry
 type TableRow = {
@@ -58,34 +58,31 @@ type TableRow = {
 };
 
 // Now, lets create our constraint system
-const system = new ConSys.ConstraintSystem<TableRow, {}>();
+const rowConstraints = new consys.ConstraintSystem<TableRow, {}>();
 
 // For our constraint, lets choose a simple assertion that must always be true:
 // The age entry of our model should always be less than 21.
 // If that should not be the case, our custom message will be returned in the evaluation.
-let data = {
+rowConstraints.addConstraint({
   constraint: 'ALWAYS: $entryAge < 21',
   message: 'The current age is $entryAge, but it can not be greater than 20.',
-};
-
-// Now, we can add the constraint to the system
-system.addConstraint(data);
+});
 
 // Before we can evaluate something though, we need to create a new instance of our model
-let model: TableRow = {
+let row: TableRow = {
   entryAge: 24,
 };
 
 // Lets evaluate our model instance
-let reports: ConSys.Report<TableRow, {}>[] = system.evaluate(model, {});
+let reports: consys.Report<TableRow, {}>[] = rowConstraints.evaluate(row, {});
 
 // We will get back an array of reports, but in our case there should only be one,
 // since we only evaluated one model instance
-let report: ConSys.Report<TableRow, {}> = reports[0];
+let report: consys.Report<TableRow, {}> = reports[0];
 
 // Again, we get back an array of evaluations, but since we only have one constraint,
 // there should only be one evaluation
-let evaluation: ConSys.Evaluation = report.evaluation[0];
+let evaluation: consys.Evaluation = report.evaluation[0];
 
 // Finally, we get our message:
 // "The current age is 24, but it can not be greater than 20."

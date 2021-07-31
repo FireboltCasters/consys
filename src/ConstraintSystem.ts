@@ -8,9 +8,9 @@ import {
   EvaluationFilter,
   FunctionType,
   Report,
-  StatementType
-} from "./Types";
-import Constraint from "./Constraint";
+  StatementType,
+} from './Types';
+import Constraint from './Constraint';
 
 /**
  * A constraint system with multiple constraints and custom functions, defined for specific model and state types.
@@ -37,7 +37,8 @@ export default class ConstraintSystem<M, S> {
       case 'inconsistent':
         return (evaluation: Evaluation) => !evaluation.consistent;
       default:
-        return (evaluation: Evaluation) => evaluationFilter(evaluation.resource);
+        return (evaluation: Evaluation) =>
+          evaluationFilter(evaluation.resource);
     }
   }
 
