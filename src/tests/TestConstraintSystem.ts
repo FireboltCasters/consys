@@ -7,7 +7,7 @@ type Model = {
   maxLength: number;
   nested: {
     value: number;
-  }
+  };
 };
 type State = {
   currentTime: string;
@@ -17,8 +17,8 @@ const model: Model = {
   time: '5:00',
   maxLength: 4,
   nested: {
-    value: 42
-  }
+    value: 42,
+  },
 };
 const state: State = {
   currentTime: '7:00',
@@ -42,7 +42,7 @@ const constraintData = [
     id: 2,
   },
   {
-    constraint: "ALWAYS: $nested.value > 40",
+    constraint: 'ALWAYS: $nested.value > 40',
     message: 'failed2',
     id: 2,
   },
@@ -133,8 +133,8 @@ test('ConstraintSystem Test', async () => {
         time: '1:00',
         maxLength: 10,
         nested: {
-          value: 42
-        }
+          value: 42,
+        },
       };
       const state: State = {
         currentTime: '4:00',
