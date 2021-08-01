@@ -7,7 +7,7 @@ type Model = {
   maxLength: number;
   nested: {
     value: number;
-  },
+  };
   fun: () => any;
 };
 type State = {
@@ -18,12 +18,12 @@ const model: Model = {
   time: '5:00',
   maxLength: 4,
   nested: {
-    value: 42
+    value: 42,
   },
   fun: () => {
-    console.log("This should not be callable");
+    console.log('This should not be callable');
     return true;
-  }
+  },
 };
 const state: State = {
   currentTime: '7:00',
@@ -47,7 +47,7 @@ const constraintData = [
     id: 2,
   },
   {
-    constraint: "ALWAYS: $nested.value > 40",
+    constraint: 'ALWAYS: $nested.value > 40',
     message: 'failed2',
     id: 2,
   },
@@ -138,12 +138,12 @@ test('ConstraintSystem Test', async () => {
         time: '1:00',
         maxLength: 10,
         nested: {
-          value: 42
+          value: 42,
         },
         fun: () => {
-          console.log("This should not be callable");
+          console.log('This should not be callable');
           return true;
-        }
+        },
       };
       const state: State = {
         currentTime: '4:00',
@@ -193,10 +193,10 @@ test('ConstraintSystem Test', async () => {
         )
       ).toBe('4? or 10:4');
       expect(() =>
-          system.getMessage('(Test*ADD(ADD(3,10), 3/Test', model, state)
+        system.getMessage('(Test*ADD(ADD(3,10), 3/Test', model, state)
       ).toThrowError();
       expect(() =>
-          system.getMessage('A(Test)*ADD(ADD(3,10), 3/Test', model, state)
+        system.getMessage('A(Test)*ADD(ADD(3,10), 3/Test', model, state)
       ).toThrowError();
     }
   }
@@ -269,15 +269,15 @@ test('ConstraintSystem Test', async () => {
   ).toThrowError();
 
   expect(() =>
-      system.addConstraint({
-        constraint: 'ALWAYS: $fun()',
-      })
+    system.addConstraint({
+      constraint: 'ALWAYS: $fun()',
+    })
   ).toThrowError();
 
   expect(() =>
-      system.addConstraint({
-        constraint: 'ALWAYS: ((3 * 3)()3 + 3) == 4',
-      })
+    system.addConstraint({
+      constraint: 'ALWAYS: ((3 * 3)()3 + 3) == 4',
+    })
   ).toThrowError();
 
   expect(() =>
@@ -297,21 +297,21 @@ test('ConstraintSystem Test', async () => {
   });
 
   expect(() =>
-      system.addConstraint({
-        constraint: ': MODEL_CHECK()',
-      })
+    system.addConstraint({
+      constraint: ': MODEL_CHECK()',
+    })
   ).toThrowError();
 
   expect(() =>
-      system.addConstraint({
-        constraint: 'ALWAYS: 4 * 3 == 5x',
-      })
+    system.addConstraint({
+      constraint: 'ALWAYS: 4 * 3 == 5x',
+    })
   ).toThrowError();
 
   expect(() =>
-      system.addConstraint({
-        constraint: 'ALWAYS: 4 * 3 &@ 12',
-      })
+    system.addConstraint({
+      constraint: 'ALWAYS: 4 * 3 &@ 12',
+    })
   ).toThrowError();
 
   expect(() => system.evaluate(model, state)).toThrowError();
