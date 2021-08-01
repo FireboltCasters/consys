@@ -50,7 +50,7 @@ After the installation, you can start using it. Here is a small example to get y
 
 ```typescript
 // First import the package
-import { ConstraintSystem } from 'consys';
+import {ConstraintSystem} from 'consys';
 
 // This is our simple model, with an id and age entry
 type TableRow = {
@@ -64,14 +64,15 @@ const rowConstraints = new ConstraintSystem<TableRow, {}>();
 // For our constraint, we choose a simple assertion that must always be true:
 rowConstraints.addConstraint({
   constraint: 'ALWAYS: $entryAge < 21',
-  message: 'Row (id: $id): Age is $entryAge, but it can not be greater than 20.'
+  message:
+    'Row (id: $id): Age is $entryAge, but it can not be greater than 20.',
 });
 
 // Before we can evaluate something, we need to create some instances of our model
 let rows: TableRow[] = [
   {id: 0, entryAge: 42},
   {id: 1, entryAge: 16},
-  {id: 2, entryAge: 1337}
+  {id: 2, entryAge: 1337},
 ];
 
 // Lets evaluate our model instance
