@@ -19,7 +19,7 @@ export default class ConstraintGenerator {
   private static getObjectValue<T>(
     object: T,
     keyChain: string,
-    stringify: boolean = false
+    stringify: boolean
   ): any {
     if (keyChain === '') {
       return stringify ? JSON.stringify(object) : object;
@@ -55,8 +55,6 @@ export default class ConstraintGenerator {
         } else if (numBracketsOpened === 0) {
           bracketEnd = i;
           break;
-        } else {
-          throw Error('Invalid syntax in token: ' + srcString);
         }
       }
     }
@@ -595,19 +593,14 @@ export default class ConstraintGenerator {
     let foundFirst = false;
     for (let i = startIndex + 1; i < trimmed.length; i++) {
       let endChar = trimmed.charAt(i);
-      if (endChar === '(') {
+      if (endChar === Symbols.BRACKET_OPEN) {
         numBrackets++;
         foundFirst = true;
-      } else if (endChar === ')') {
+      } else if (endChar === Symbols.BRACKET_CLOSE) {
         numBrackets--;
       }
       if (foundFirst && numBrackets === 0) {
         end = i + 1;
-        break;
-      }
-      if (numBrackets === 0 && !endChar.match(/\w/g)) {
-        foundFirst = true;
-        end = i;
         break;
       }
     }
@@ -705,7 +698,6 @@ export default class ConstraintGenerator {
     let done = false;
     let startIndex = 0;
     let endIndex = 0;
-    let iterations = 0;
     while (!done) {
       let startChar = trimmed[startIndex];
 
@@ -769,16 +761,61 @@ export default class ConstraintGenerator {
       if (startIndex >= trimmed.length) {
         done = true;
       }
-
-      if (iterations++ > 1000) {
-        throw Error(
-          'Maximum number of parsing iterations reached, there is a syntax error here: ' +
-            data
-        );
-      }
     }
 
     return this.getStringFromTokens(tokens);
+  }
+
+  /**
+   * Checks if a given token belongs to the set of symbols that chain together expressions.
+   *
+   * @param token token to be checked
+   * @private
+   */
+  private static isChainingSymbol(token: string): boolean {
+    switch (token) {
+      case Symbols.PLUS:
+      case Symbols.MINUS:
+      case Symbols.TIMES:
+      case Symbols.DIV:
+      case Symbols.MOD:
+      case Symbols.AND:
+      case Symbols.OR:
+      case Symbols.LESS:
+      case Symbols.LESS_EQUAL:
+      case Symbols.EQUAL:
+      case Symbols.NOT_EQUAL:
+      case Symbols.GREATER_EQUAL:
+      case Symbols.GREATER:
+      case Symbols.BRACKET_CLOSE:
+        return true;
+      default: return false;
+    }
+  }
+
+  /**
+   * Checks if a set of tokens satisfies the DSL syntax.
+   *
+   * @param tokens tokens to be checked
+   * @private
+   */
+  private checkSyntax(tokens: string[]) {
+
+    for (let i = 0; i < tokens.length - 1; i++) {
+      let token = tokens[i];
+      let nextToken = tokens[i + 1];
+
+      if (ConstraintGenerator.isModelVariable(token) ||
+          ConstraintGenerator.isStateVariable(token) ||
+          this.isFunctionToken(token) ||
+          this.isStatementToken(token) ||
+          token === Symbols.BRACKET_CLOSE) {
+
+        if (!ConstraintGenerator.isChainingSymbol(nextToken)) {
+          throw Error("Invalid syntax: " + token + " must not be followed by " + nextToken);
+        }
+      }
+    }
   }
 
   /**
@@ -791,6 +828,8 @@ export default class ConstraintGenerator {
     if (Config.DEBUG_LOG) {
       console.log('Original tokens: ', tokens);
     }
+
+    this.checkSyntax(tokens);
 
     let condString = '';
     for (let token of tokens) {
@@ -1041,14 +1080,16 @@ export default class ConstraintGenerator {
         args.push(
           ConstraintGenerator.getObjectValue(
             model,
-            argsString.replace(Symbols.MODEL_PREFIX, '')
+            argsString.replace(Symbols.MODEL_PREFIX, ''),
+              false
           )
         );
       } else if (ConstraintGenerator.isStateVariable(argsString)) {
         args.push(
           ConstraintGenerator.getObjectValue(
             state,
-            argsString.replace(Symbols.STATE_PREFIX, '')
+            argsString.replace(Symbols.STATE_PREFIX, ''),
+              false
           )
         );
       } else if (ConstraintGenerator.isString(argsString)) {
