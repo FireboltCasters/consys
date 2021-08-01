@@ -50,12 +50,12 @@ After the installation, you can start using it. Here is a small example to get y
 
 ```typescript
 // First import the package
-import { ConstraintSystem } from 'consys';
+import {ConstraintSystem} from 'consys';
 
 // This is our simple model, with an id and age entry
 type TableRow = {
-    id: number;
-    entryAge: number;
+  id: number;
+  entryAge: number;
 };
 
 // Now, lets create our constraint system
@@ -65,29 +65,29 @@ const rowConstraints = new ConstraintSystem<TableRow, {}>();
 // The age entry of our model should always be less than 21.
 // If that should not be the case, our custom message will be returned in the evaluation.
 rowConstraints.addConstraint({
-    constraint: 'ALWAYS: $entryAge < 21',
-    message: 'Row (id: $id): Age is $entryAge, but it can not be greater than 20.',
+  constraint: 'ALWAYS: $entryAge < 21',
+  message:
+    'Row (id: $id): Age is $entryAge, but it can not be greater than 20.',
 });
 
 // Before we can evaluate something though, we need to create some instances of our model
 let rows: TableRow[] = [
-    { id: 0, entryAge: 42 },
-    { id: 1, entryAge: 16 },
-    { id: 2, entryAge: 1337 }
+  {id: 0, entryAge: 42},
+  {id: 1, entryAge: 16},
+  {id: 2, entryAge: 1337},
 ];
 
 // Lets evaluate our model instance
 let reports = rowConstraints.evaluate(rows, {});
 
 for (let report of reports) {
-  
-    // Since we have only one constraint, so there is only one evaluation
-    let evaluation = report.evaluation[0];
+  // Since we have only one constraint, so there is only one evaluation
+  let evaluation = report.evaluation[0];
 
-    // Now print all errors
-    if (!evaluation.consistent) {
-        console.log(evaluation.message);
-    }
+  // Now print all errors
+  if (!evaluation.consistent) {
+    console.log(evaluation.message);
+  }
 }
 ```
 
