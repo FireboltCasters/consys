@@ -74,15 +74,15 @@ let row: TableRow = {
 };
 
 // Lets evaluate our model instance
-let reports: consys.Report<TableRow, {}>[] = rowConstraints.evaluate(row, {});
+let reports = rowConstraints.evaluate(row, {});
 
 // We will get back an array of reports, but in our case there should only be one,
 // since we only evaluated one model instance
-let report: consys.Report<TableRow, {}> = reports[0];
+let report = reports[0];
 
 // Again, we get back an array of evaluations, but since we only have one constraint,
 // there should only be one evaluation
-let evaluation: consys.Evaluation = report.evaluation[0];
+let evaluation = report.evaluation[0];
 
 // Finally, we get our message:
 // "The current age is 24, but it can not be greater than 20."
