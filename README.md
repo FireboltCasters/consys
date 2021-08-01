@@ -64,8 +64,7 @@ const rowConstraints = new ConstraintSystem<TableRow, {}>();
 // For our constraint, we choose a simple assertion that must always be true:
 rowConstraints.addConstraint({
   constraint: 'ALWAYS: $entryAge < 21',
-  message:
-    'Row (id: $id): Age is $entryAge, but it can not be greater than 20.',
+  message: 'Row (id: $id): Age is $entryAge, but it must be 20 or lower.',
 });
 
 // Before we can evaluate something, we need to create some instances of our model
@@ -90,8 +89,8 @@ for (let report of reports) {
 ```
 
 ```console
->> Row (id: 0): Age is 42, but it can not be greater than 20.
->> Row (id: 2): Age is 1337, but it can not be greater than 20.
+>> Row (id: 0): Age is 42, but it must be 20 or lower.
+>> Row (id: 2): Age is 1337, but it must be 20 or lower.
 ```
 
 ## Documentation
