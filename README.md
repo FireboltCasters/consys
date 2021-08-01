@@ -50,43 +50,50 @@ After the installation, you can start using it. Here is a small example to get y
 
 ```typescript
 // First import the package
-import * as consys from 'consys';
+import { ConstraintSystem } from 'consys';
 
-// This is our simple model, with one age entry
+// This is our simple model, with an id and age entry
 type TableRow = {
-  entryAge: number;
+    id: number;
+    entryAge: number;
 };
 
 // Now, lets create our constraint system
-const rowConstraints = new consys.ConstraintSystem<TableRow, {}>();
+const rowConstraints = new ConstraintSystem<TableRow, {}>();
 
 // For our constraint, lets choose a simple assertion that must always be true:
 // The age entry of our model should always be less than 21.
 // If that should not be the case, our custom message will be returned in the evaluation.
 rowConstraints.addConstraint({
-  constraint: 'ALWAYS: $entryAge < 21',
-  message: 'The current age is $entryAge, but it can not be greater than 20.',
+    constraint: 'ALWAYS: $entryAge < 21',
+    message: 'Row (id: $id): Age is $entryAge, but it can not be greater than 20.',
 });
 
-// Before we can evaluate something though, we need to create a new instance of our model
-let row: TableRow = {
-  entryAge: 24,
-};
+// Before we can evaluate something though, we need to create some instances of our model
+let rows: TableRow[] = [
+    { id: 0, entryAge: 42 },
+    { id: 1, entryAge: 16 },
+    { id: 2, entryAge: 1337 }
+];
 
 // Lets evaluate our model instance
-let reports = rowConstraints.evaluate(row, {});
+let reports = rowConstraints.evaluate(rows, {});
 
-// We will get back an array of reports, but in our case there should only be one,
-// since we only evaluated one model instance
-let report = reports[0];
+for (let report of reports) {
+  
+    // Since we have only one constraint, so there is only one evaluation
+    let evaluation = report.evaluation[0];
 
-// Again, we get back an array of evaluations, but since we only have one constraint,
-// there should only be one evaluation
-let evaluation = report.evaluation[0];
+    // Now print all errors
+    if (!evaluation.consistent) {
+        console.log(evaluation.message);
+    }
+}
+```
 
-// Finally, we get our message:
-// "The current age is 24, but it can not be greater than 20."
-console.log(evaluation.message);
+```console
+>> Row (id: 0): Age is 42, but it can not be greater than 20.
+>> Row (id: 2): Age is 1337, but it can not be greater than 20.
 ```
 
 ## Documentation
