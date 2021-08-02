@@ -86,6 +86,7 @@ for (let report of reports) {
   }
 }
 ```
+
 Output:
 
 ```console
