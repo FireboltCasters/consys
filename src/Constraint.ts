@@ -49,7 +49,9 @@ export default class Constraint<M, S> {
         resource: this.resource,
         func: String(this.assertionFunction),
       };
-      throw Log.error('Invalid constraint function generated: ' + JSON.stringify(errorObj));
+      throw Log.error(
+        'Invalid constraint function generated: ' + JSON.stringify(errorObj)
+      );
     }
   }
 

@@ -1,4 +1,4 @@
-import Config from "./Config";
+import Config from './Config';
 
 /**
  * Evaluation data for a single constraint.
@@ -61,7 +61,6 @@ export interface ConstraintData {
  * Utility log class.
  */
 export class Log {
-
   /**
    * Just like console log, but only logs if enabled.
    *
@@ -69,7 +68,7 @@ export class Log {
    */
   static print(...args: any[]) {
     if (Config.DEBUG_LOG) {
-      console.log("consys: ", ...args);
+      console.log('consys: ', ...args);
     }
   }
 
@@ -79,6 +78,6 @@ export class Log {
    * @param msg error message
    */
   static error(msg: string): Error {
-    return Error("consys: " + msg);
+    return Error('consys: ' + msg);
   }
 }

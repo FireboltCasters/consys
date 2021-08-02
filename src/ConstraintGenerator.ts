@@ -470,7 +470,6 @@ export default class ConstraintGenerator {
    * @param resource constraint data
    */
   generateFunction<T extends ConstraintData>(resource: T): Function {
-
     Log.print('Starting constraint generation with data: ', resource);
 
     let constraint = resource.constraint;
@@ -800,7 +799,8 @@ export default class ConstraintGenerator {
       case Symbols.GREATER:
       case Symbols.PARENTHESIS_CLOSE:
         return true;
-      default: return false;
+      default:
+        return false;
     }
   }
 
@@ -811,19 +811,21 @@ export default class ConstraintGenerator {
    * @private
    */
   private checkSyntax(tokens: string[]) {
-
     for (let i = 0; i < tokens.length - 1; i++) {
       let token = tokens[i];
       let nextToken = tokens[i + 1];
 
-      if (ConstraintGenerator.isModelVariable(token) ||
-          ConstraintGenerator.isStateVariable(token) ||
-          this.isFunctionToken(token) ||
-          this.isStatementToken(token) ||
-          token === Symbols.PARENTHESIS_CLOSE) {
-
+      if (
+        ConstraintGenerator.isModelVariable(token) ||
+        ConstraintGenerator.isStateVariable(token) ||
+        this.isFunctionToken(token) ||
+        this.isStatementToken(token) ||
+        token === Symbols.PARENTHESIS_CLOSE
+      ) {
         if (!ConstraintGenerator.isChainingSymbol(nextToken)) {
-          throw Log.error("Invalid syntax: " + token + " must not be followed by " + nextToken);
+          throw Log.error(
+            'Invalid syntax: ' + token + ' must not be followed by ' + nextToken
+          );
         }
       }
     }
@@ -836,7 +838,6 @@ export default class ConstraintGenerator {
    * @private
    */
   private getStringFromTokens(tokens: string[]): string {
-
     Log.print('Original tokens: ', tokens);
 
     this.checkSyntax(tokens);
@@ -1089,7 +1090,7 @@ export default class ConstraintGenerator {
           ConstraintGenerator.getObjectValue(
             model,
             argsString.replace(Symbols.MODEL_PREFIX, ''),
-              false
+            false
           )
         );
       } else if (ConstraintGenerator.isStateVariable(argsString)) {
@@ -1097,7 +1098,7 @@ export default class ConstraintGenerator {
           ConstraintGenerator.getObjectValue(
             state,
             argsString.replace(Symbols.STATE_PREFIX, ''),
-              false
+            false
           )
         );
       } else if (ConstraintGenerator.isString(argsString)) {
