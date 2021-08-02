@@ -1,15 +1,15 @@
 import ConstraintGenerator from './ConstraintGenerator';
 import ConstraintSystemPlugin from './ConstraintSystemPlugin';
-import Config from './Config';
 import {
   ConstraintData,
   Evaluation,
   EvaluationFilerFunction,
   EvaluationFilter,
   FunctionType,
+  Log,
   Report,
   StatementType,
-} from './Types';
+} from './Util';
 import Constraint from './Constraint';
 
 /**
@@ -50,9 +50,7 @@ export default class ConstraintSystem<M, S> {
   async registerPlugin(plugin: ConstraintSystemPlugin<M, S>) {
     await plugin.registerFunctions(this);
     await plugin.registerConstraints(this);
-    if (Config.DEBUG_LOG) {
-      console.log('Registered plugin: ' + plugin.constructor.name);
-    }
+    Log.print('Registered plugin: ' + plugin.constructor.name);
   }
 
   /**
@@ -92,6 +90,9 @@ export default class ConstraintSystem<M, S> {
    * @private
    */
   private addFun(name: string, fun: Function) {
+    if (this.functions[name] !== undefined) {
+      throw Log.error('Function with name ' + name + ' is already registered');
+    }
     this.functions[name] = fun;
     this.generator.registerFunction(name);
   }

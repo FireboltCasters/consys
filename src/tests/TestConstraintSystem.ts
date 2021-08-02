@@ -1,6 +1,6 @@
 import * as ConSys from '../index';
 import Config from '../Config';
-import {ConstraintData} from '../Types';
+import {ConstraintData} from '../Util';
 
 type Model = {
   time: string;

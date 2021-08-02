@@ -1,5 +1,5 @@
 import ConstraintGenerator from './ConstraintGenerator';
-import {ConstraintData, Evaluation} from './Types';
+import {ConstraintData, Evaluation, Log} from './Util';
 
 /**
  * Represents a single constraint, with specified model and state data types.
@@ -49,9 +49,7 @@ export default class Constraint<M, S> {
         resource: this.resource,
         func: String(this.assertionFunction),
       };
-      throw Error(
-        'Invalid constraint function generated: ' + JSON.stringify(errorObj)
-      );
+      throw Log.error('Invalid constraint function generated: ' + JSON.stringify(errorObj));
     }
   }
 

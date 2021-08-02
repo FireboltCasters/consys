@@ -1,6 +1,5 @@
-import {ConstraintData} from './Types';
+import {ConstraintData, Log} from './Util';
 import FunctionGenerator from './ignoreCoverage/FunctionGenerator';
-import Config from './Config';
 import {Symbols} from './Symbols';
 
 /**
@@ -8,6 +7,26 @@ import {Symbols} from './Symbols';
  */
 export default class ConstraintGenerator {
   private readonly customFunctions: string[] = [];
+
+  // only the start symbol of each operator, used for parsing
+  private static readonly OPERATOR_START = [
+    Symbols.LESS,
+    Symbols.LESS_EQUAL,
+    Symbols.EQUAL,
+    Symbols.NOT_EQUAL,
+    Symbols.GREATER_EQUAL,
+    Symbols.GREATER,
+    Symbols.PLUS,
+    Symbols.MINUS,
+    Symbols.TIMES,
+    Symbols.DIV,
+    Symbols.MOD,
+    Symbols.PARENTHESIS_OPEN,
+    Symbols.PARENTHESIS_CLOSE,
+    Symbols.AND,
+    Symbols.OR,
+    Symbols.NOT,
+  ].map(symbol => symbol.charAt(0));
 
   /**
    * Returns the object value of a nested string key such as 'test.anotherTest.value'
@@ -42,14 +61,14 @@ export default class ConstraintGenerator {
    * @private
    */
   private static getSubstringWithinParentheses(srcString: string): string {
-    let bracketStart = srcString.indexOf(Symbols.BRACKET_OPEN) + 1;
+    let bracketStart = srcString.indexOf(Symbols.PARENTHESIS_OPEN) + 1;
     let bracketEnd = bracketStart;
     let numBracketsOpened = 0;
     for (let i = bracketStart; i < srcString.length; i++) {
       let char = srcString.charAt(i);
-      if (char === Symbols.BRACKET_OPEN) {
+      if (char === Symbols.PARENTHESIS_OPEN) {
         numBracketsOpened++;
-      } else if (char === Symbols.BRACKET_CLOSE) {
+      } else if (char === Symbols.PARENTHESIS_CLOSE) {
         if (numBracketsOpened > 0) {
           numBracketsOpened--;
         } else if (numBracketsOpened === 0) {
@@ -112,9 +131,6 @@ export default class ConstraintGenerator {
    * @param name name of the function
    */
   registerFunction(name: string) {
-    if (this.customFunctions.includes(name)) {
-      throw Error('Function with name ' + name + ' is already registered');
-    }
     this.customFunctions.push(name);
   }
 
@@ -201,8 +217,8 @@ export default class ConstraintGenerator {
     if (
       charIndex === 0 ||
       charIndex === srcString.length - 1 ||
-      char === '(' ||
-      char === ')'
+      char === Symbols.PARENTHESIS_OPEN ||
+      char === Symbols.PARENTHESIS_CLOSE
     ) {
       return false;
     }
@@ -227,7 +243,7 @@ export default class ConstraintGenerator {
           srcString
         );
         if (closingBracketIndex === -1) {
-          throw Error('Syntax error in function: ' + srcString);
+          throw Log.error('Syntax error in function: ' + srcString);
         }
         if (
           charIndex > openingBracketIndex &&
@@ -298,7 +314,7 @@ export default class ConstraintGenerator {
     // this is not a statement, but a function
     if (
       endIndex < srcString.length - 1 &&
-      srcString.charAt(endIndex) === Symbols.BRACKET_OPEN
+      srcString.charAt(endIndex) === Symbols.PARENTHESIS_OPEN
     ) {
       return [-1, endIndex];
     }
@@ -400,7 +416,7 @@ export default class ConstraintGenerator {
           res,
           currentIndex
         );
-      } else if (char === Symbols.BRACKET_OPEN) {
+      } else if (char === Symbols.PARENTHESIS_OPEN) {
         currentIndex = this.handleAddFunctionToken(
           srcString,
           res,
@@ -439,7 +455,7 @@ export default class ConstraintGenerator {
       }
     }
     if (splitIndex === -1) {
-      throw Error('Invalid syntax for token: ' + srcString);
+      throw Log.error('Invalid syntax for token: ' + srcString);
     }
     let res: string[] = [];
     res.push(srcString.substring(0, splitIndex));
@@ -454,9 +470,8 @@ export default class ConstraintGenerator {
    * @param resource constraint data
    */
   generateFunction<T extends ConstraintData>(resource: T): Function {
-    if (Config.DEBUG_LOG) {
-      console.log('Starting constraint generation with data: ', resource);
-    }
+
+    Log.print('Starting constraint generation with data: ', resource);
 
     let constraint = resource.constraint;
     let tokens = this.getSplitTokens(constraint);
@@ -464,10 +479,8 @@ export default class ConstraintGenerator {
     let activationToken = tokens[0].trim();
     let assertionToken = tokens[1].trim();
 
-    if (Config.DEBUG_LOG) {
-      console.log('Activation token: ', activationToken);
-      console.log('Assertion token: ', assertionToken);
-    }
+    Log.print('Activation token: ', activationToken);
+    Log.print('Assertion token: ', assertionToken);
 
     let activationString;
 
@@ -480,20 +493,18 @@ export default class ConstraintGenerator {
     } else if (this.isStatementToken(activationToken)) {
       activationString = `this.functions['${activationToken}'](this.model,this.state)`;
     } else {
-      throw Error('Invalid syntax in constraint: ' + constraint);
+      throw Log.error('Invalid syntax in constraint: ' + constraint);
     }
 
     let assertionString = this.generateConditionalString(assertionToken);
     let functionString = `if(${activationString}){return(${assertionString});}else{return(true);}`;
 
-    if (Config.DEBUG_LOG) {
-      console.log('Generated constraint: ', functionString);
-    }
+    Log.print('Generated constraint: ', functionString);
 
     try {
       return FunctionGenerator.generateFromString(functionString);
     } catch (error) {
-      throw Error('Invalid syntax in constraint: ' + constraint);
+      throw Log.error('Invalid syntax in constraint: ' + constraint);
     }
   }
 
@@ -593,10 +604,10 @@ export default class ConstraintGenerator {
     let foundFirst = false;
     for (let i = startIndex + 1; i < trimmed.length; i++) {
       let endChar = trimmed.charAt(i);
-      if (endChar === Symbols.BRACKET_OPEN) {
+      if (endChar === Symbols.PARENTHESIS_OPEN) {
         numBrackets++;
         foundFirst = true;
-      } else if (endChar === Symbols.BRACKET_CLOSE) {
+      } else if (endChar === Symbols.PARENTHESIS_CLOSE) {
         numBrackets--;
       }
       if (foundFirst && numBrackets === 0) {
@@ -737,7 +748,7 @@ export default class ConstraintGenerator {
         );
 
         // we have some sort of operator here, we must do this by hand unfortunately
-      } else if (Symbols.OPERATOR_START.includes(startChar)) {
+      } else if (ConstraintGenerator.OPERATOR_START.includes(startChar)) {
         endIndex = ConstraintGenerator.getOperatorEndIndex(
           trimmed,
           startChar,
@@ -745,8 +756,8 @@ export default class ConstraintGenerator {
           endIndex
         );
       } else {
-        throw Error(
-          'Unable to parse statement: ' +
+        throw Log.error(
+          'Unable to parse expression: ' +
             data +
             ', char: ' +
             startChar +
@@ -787,7 +798,7 @@ export default class ConstraintGenerator {
       case Symbols.NOT_EQUAL:
       case Symbols.GREATER_EQUAL:
       case Symbols.GREATER:
-      case Symbols.BRACKET_CLOSE:
+      case Symbols.PARENTHESIS_CLOSE:
         return true;
       default: return false;
     }
@@ -809,10 +820,10 @@ export default class ConstraintGenerator {
           ConstraintGenerator.isStateVariable(token) ||
           this.isFunctionToken(token) ||
           this.isStatementToken(token) ||
-          token === Symbols.BRACKET_CLOSE) {
+          token === Symbols.PARENTHESIS_CLOSE) {
 
         if (!ConstraintGenerator.isChainingSymbol(nextToken)) {
-          throw Error("Invalid syntax: " + token + " must not be followed by " + nextToken);
+          throw Log.error("Invalid syntax: " + token + " must not be followed by " + nextToken);
         }
       }
     }
@@ -825,9 +836,8 @@ export default class ConstraintGenerator {
    * @private
    */
   private getStringFromTokens(tokens: string[]): string {
-    if (Config.DEBUG_LOG) {
-      console.log('Original tokens: ', tokens);
-    }
+
+    Log.print('Original tokens: ', tokens);
 
     this.checkSyntax(tokens);
 
@@ -835,9 +845,7 @@ export default class ConstraintGenerator {
     for (let token of tokens) {
       let symbol = this.getSymbolForToken(token);
       condString += symbol;
-      if (Config.DEBUG_LOG) {
-        console.log('Original: ', token, ' Parsed: ', symbol);
-      }
+      Log.print('Original: ', token, ' Parsed: ', symbol);
     }
 
     return condString;
@@ -867,8 +875,8 @@ export default class ConstraintGenerator {
   private isStatementToken(token: string): boolean {
     return (
       this.isFunctionToken(token) &&
-      !token.includes('(') &&
-      !token.includes(')')
+      !token.includes(Symbols.PARENTHESIS_OPEN) &&
+      !token.includes(Symbols.PARENTHESIS_CLOSE)
     );
   }
 
@@ -886,9 +894,9 @@ export default class ConstraintGenerator {
     let numBrackets = 0;
     for (let i = startIndex; i < trimmed.length; i++) {
       let char = trimmed[i];
-      if (char === Symbols.BRACKET_OPEN) {
+      if (char === Symbols.PARENTHESIS_OPEN) {
         numBrackets++;
-      } else if (char === Symbols.BRACKET_CLOSE) {
+      } else if (char === Symbols.PARENTHESIS_CLOSE) {
         numBrackets--;
         if (numBrackets === 0 && i === trimmed.length - 1) {
           res.push(trimmed.substring(startIndex, i + 1));
@@ -980,9 +988,9 @@ export default class ConstraintGenerator {
           return '/';
         case Symbols.MOD:
           return '%';
-        case Symbols.BRACKET_OPEN:
+        case Symbols.PARENTHESIS_OPEN:
           return '(';
-        case Symbols.BRACKET_CLOSE:
+        case Symbols.PARENTHESIS_CLOSE:
           return ')';
         case Symbols.AND:
           return '&&';
@@ -991,7 +999,7 @@ export default class ConstraintGenerator {
         case Symbols.NOT:
           return '!';
         default:
-          throw Error('Invalid token in constraint: ' + token);
+          throw Log.error('Invalid token in constraint: ' + token);
       }
     }
   }

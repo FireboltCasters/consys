@@ -30,31 +30,11 @@ export class Symbols {
   static readonly TIMES = '*';
   static readonly DIV = '/';
   static readonly MOD = '%';
-  static readonly BRACKET_OPEN = '(';
-  static readonly BRACKET_CLOSE = ')';
+  static readonly PARENTHESIS_OPEN = '(';
+  static readonly PARENTHESIS_CLOSE = ')';
 
   // logic
   static readonly AND = '&&';
   static readonly OR = '||';
   static readonly NOT = '!';
-
-  // only the start symbol of each operator, used for parsing
-  static readonly OPERATOR_START = [
-    Symbols.LESS,
-    Symbols.LESS_EQUAL,
-    Symbols.EQUAL,
-    Symbols.NOT_EQUAL,
-    Symbols.GREATER_EQUAL,
-    Symbols.GREATER,
-    Symbols.PLUS,
-    Symbols.MINUS,
-    Symbols.TIMES,
-    Symbols.DIV,
-    Symbols.MOD,
-    Symbols.BRACKET_OPEN,
-    Symbols.BRACKET_CLOSE,
-    Symbols.AND,
-    Symbols.OR,
-    Symbols.NOT,
-  ].map(symbol => symbol.charAt(0));
 }
