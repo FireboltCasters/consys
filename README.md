@@ -7,7 +7,6 @@
   <a href="https://www.npmjs.com/package/consys"><img src="https://img.shields.io/npm/dm/consys.svg" alt="downloads week" /></a>
   <a href="https://www.npmjs.com/package/consys"><img src="https://img.shields.io/npm/dt/consys.svg" alt="downloads total" /></a>
   <a href="https://github.com/FireboltCasters/consys"><img src="https://shields.io/github/languages/code-size/FireboltCasters/consys" alt="size" /></a>
-  <a href="https://david-dm.org/FireboltCasters/consys"><img src="https://david-dm.org/FireboltCasters/consys/status.svg" alt="dependencies" /></a>
   <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FFireboltCasters%2Fconsys?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FFireboltCasters%2Fconsys.svg?type=shield"/></a>
   <a href="https://github.com/google/gts" alt="Google TypeScript Style"><img src="https://img.shields.io/badge/code%20style-google-blueviolet.svg"/></a>
   <a href="https://shields.io/" alt="Google TypeScript Style"><img src="https://img.shields.io/badge/uses-TypeScript-blue.svg"/></a>
@@ -32,7 +31,7 @@
 **consys** is a flexible tool to evaluate models using generic and readable constraints.
 
 - **Modern & Lightweight:** consys has full TypeScript support and uses no additional dependencies, so it can easily be integrated.
-- **Customizable:** Register custom functions and plugins, tailered to the application.
+- **Customizable:** Register custom functions and plugins, tailored to the application.
 - **Flexible:** Constraints are designed to be as flexible as possible, while still being readable.
 - **User friendly:** consys defines its own domain specific language to manage constraints, making it easy to read and fully generic.
 
@@ -50,43 +49,49 @@ After the installation, you can start using it. Here is a small example to get y
 
 ```typescript
 // First import the package
-import * as consys from 'consys';
+import {ConstraintSystem} from 'consys';
 
-// This is our simple model, with one age entry
+// This is our simple model, with an id and age entry
 type TableRow = {
+  id: number;
   entryAge: number;
 };
 
 // Now, lets create our constraint system
-const rowConstraints = new consys.ConstraintSystem<TableRow, {}>();
+const rowConstraints = new ConstraintSystem<TableRow, {}>();
 
-// For our constraint, lets choose a simple assertion that must always be true:
-// The age entry of our model should always be less than 21.
-// If that should not be the case, our custom message will be returned in the evaluation.
+// For our constraint, we choose a simple assertion that must always be true:
 rowConstraints.addConstraint({
   constraint: 'ALWAYS: $entryAge < 21',
-  message: 'The current age is $entryAge, but it can not be greater than 20.',
+  message: 'Row (id: $id): Age is $entryAge, but it must be 20 or lower.',
 });
 
-// Before we can evaluate something though, we need to create a new instance of our model
-let row: TableRow = {
-  entryAge: 24,
-};
+// Before we can evaluate something, we need to create some instances of our model
+let rows: TableRow[] = [
+  {id: 0, entryAge: 42},
+  {id: 1, entryAge: 16},
+  {id: 2, entryAge: 1337},
+];
 
 // Lets evaluate our model instance
-let reports = rowConstraints.evaluate(row, {});
+let reports = rowConstraints.evaluate(rows, {});
 
-// We will get back an array of reports, but in our case there should only be one,
-// since we only evaluated one model instance
-let report = reports[0];
+for (let report of reports) {
+  // Since we have only one constraint, there is only one evaluation
+  let evaluation = report.evaluation[0];
 
-// Again, we get back an array of evaluations, but since we only have one constraint,
-// there should only be one evaluation
-let evaluation = report.evaluation[0];
+  // Now print all errors
+  if (!evaluation.consistent) {
+    console.log(evaluation.message);
+  }
+}
+```
 
-// Finally, we get our message:
-// "The current age is 24, but it can not be greater than 20."
-console.log(evaluation.message);
+Output:
+
+```console
+>> Row (id: 0): Age is 42, but it must be 20 or lower.
+>> Row (id: 2): Age is 1337, but it must be 20 or lower.
 ```
 
 ## Documentation
