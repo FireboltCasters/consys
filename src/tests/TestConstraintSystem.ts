@@ -215,6 +215,7 @@ test('ConstraintSystem Test', async () => {
 
   expect(system.getNumInconsistentConstraints(model, state)).toBe(1);
   expect(system.getNumConsistentConstraints(model, state)).toBe(6);
+  expect(system.getNumConstraints()).toBe(7);
 
   expect(report0[0].evaluation.length).toBe(1);
   expect(report1[0].evaluation.length).toBe(6);

@@ -217,6 +217,13 @@ export default class ConstraintSystem<M, S> {
   }
 
   /**
+   * Returns the number of constraints that were added to this system.
+   */
+  getNumConstraints(): number {
+    return this.constraints.length;
+  }
+
+  /**
    * Updates the data used to evaluate constraints with the new model, state and functions.
    *
    * @param model new model
