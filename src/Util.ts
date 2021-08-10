@@ -63,7 +63,7 @@ export interface ConstraintData {
 export interface EvaluationData<M, S> {
   model: M;
   state: S;
-  functions: {[key: string]: Function}
+  functions: {[key: string]: Function};
 }
 
 /**
