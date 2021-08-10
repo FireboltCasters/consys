@@ -2,7 +2,8 @@ import ConstraintGenerator from './ConstraintGenerator';
 import ConstraintSystemPlugin from './ConstraintSystemPlugin';
 import {
   ConstraintData,
-  Evaluation, EvaluationData,
+  Evaluation,
+  EvaluationData,
   EvaluationFilerFunction,
   EvaluationFilter,
   FunctionType,
@@ -213,7 +214,9 @@ export default class ConstraintSystem<M, S> {
    * @param state state to be evaluated
    */
   getNumConsistentConstraints(model: M, state: S): number {
-    return this.constraints.length - this.getNumInconsistentConstraints(model, state);
+    return (
+      this.constraints.length - this.getNumInconsistentConstraints(model, state)
+    );
   }
 
   /**
