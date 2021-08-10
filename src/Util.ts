@@ -49,12 +49,21 @@ export type EvaluationFilter =
   | ResourceFilterFunction;
 
 /**
- * This is the minimum amount of data needed to generate and evaluate a constraint.
+ * This is the minimum amount of data needed to generate a constraint.
  */
 export interface ConstraintData {
   constraint: string;
   message?: string;
   [key: string]: any;
+}
+
+/**
+ * Data needed to evaluate a constraint.
+ */
+export interface EvaluationData<M, S> {
+  model: M;
+  state: S;
+  functions: {[key: string]: Function}
 }
 
 /**

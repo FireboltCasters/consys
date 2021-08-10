@@ -103,9 +103,7 @@ test('ConstraintSystem Test', async () => {
     async registerConstraints(
       system: ConSys.ConstraintSystem<Model, State>
     ): Promise<void> {
-      for (let i = 0; i < constraintData.length; i++) {
-        system.addConstraint(constraintData[i]);
-      }
+      system.addConstraints(constraintData);
     }
 
     /**
@@ -214,6 +212,9 @@ test('ConstraintSystem Test', async () => {
   const report2 = system.evaluate(model, state, 'all');
   const report3 = system.evaluate(model, state, resource => resource.id === 0);
   const report4 = system.evaluate(model, state);
+
+  expect(system.getNumInconsistentConstraints(model, state)).toBe(1);
+  expect(system.getNumConsistentConstraints(model, state)).toBe(6);
 
   expect(report0[0].evaluation.length).toBe(1);
   expect(report1[0].evaluation.length).toBe(6);

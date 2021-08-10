@@ -1,5 +1,5 @@
 import ConstraintGenerator from './ConstraintGenerator';
-import {ConstraintData, Evaluation, Log} from './Util';
+import {ConstraintData, Evaluation, EvaluationData, Log} from './Util';
 
 /**
  * Represents a single constraint, with specified model and state data types.
@@ -26,11 +26,9 @@ export default class Constraint<M, S> {
    *
    * @param data data to evaluate, along with functions
    */
-  evaluate<
-    D extends {model: M; state: S; functions: {[key: string]: Function}}
-  >(data: D): Evaluation {
+  evaluate(data: EvaluationData<M, S>): Evaluation {
     try {
-      let consistent = this.assertionFunction.apply(data, null);
+      let consistent = this.isConsistent(data);
       return {
         consistent: consistent,
         message:
@@ -51,6 +49,15 @@ export default class Constraint<M, S> {
       };
       throw Log.error('Invalid constraint function generated: ' + JSON.stringify(errorObj));
     }
+  }
+
+  /**
+   * Checks if this constraint is consistent with given model, state and functions.
+   *
+   * @param data data to evaluate, along with functions
+   */
+  isConsistent(data: EvaluationData<M, S>): boolean {
+    return this.assertionFunction.apply(data, null);
   }
 
   /**

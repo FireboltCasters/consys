@@ -2,7 +2,7 @@ import ConstraintGenerator from './ConstraintGenerator';
 import ConstraintSystemPlugin from './ConstraintSystemPlugin';
 import {
   ConstraintData,
-  Evaluation,
+  Evaluation, EvaluationData,
   EvaluationFilerFunction,
   EvaluationFilter,
   FunctionType,
@@ -19,6 +19,7 @@ export default class ConstraintSystem<M, S> {
   private readonly generator: ConstraintGenerator = new ConstraintGenerator();
   private readonly constraints: Constraint<M, S>[] = [];
   private readonly functions: {[key: string]: Function} = {};
+  private evaluationData: EvaluationData<M, S> | null = null;
 
   /**
    * For a given evaluation filter type, return the corresponding function
@@ -60,6 +61,17 @@ export default class ConstraintSystem<M, S> {
    */
   addConstraint(resource: ConstraintData) {
     this.constraints.push(new Constraint(resource, this.generator));
+  }
+
+  /**
+   * Adds an array of constraints to this constraint system.
+   *
+   * @param resources constraint data
+   */
+  addConstraints(resources: ConstraintData[]) {
+    for (let resource of resources) {
+      this.addConstraint(resource);
+    }
   }
 
   /**
@@ -163,13 +175,9 @@ export default class ConstraintSystem<M, S> {
    */
   private evaluateSingle(model: M, state: S): Report<M, S> {
     let evaluationRes = [];
-    let data = {
-      model: model,
-      state: state,
-      functions: this.functions,
-    };
+    this.updateEvaluationData(model, state);
     for (let constraint of this.constraints) {
-      let evaluation = constraint.evaluate(data);
+      let evaluation = constraint.evaluate(this.evaluationData!!);
       evaluationRes.push(evaluation);
     }
     let constraintData = this.getConstraintData();
@@ -179,6 +187,54 @@ export default class ConstraintSystem<M, S> {
       checkedConstraints: constraintData,
       evaluation: evaluationRes,
     };
+  }
+
+  /**
+   * Returns the number of constraints that are inconsistent with the given model and state.
+   *
+   * @param model model to be evaluated
+   * @param state state to be evaluated
+   */
+  getNumInconsistentConstraints(model: M, state: S): number {
+    this.updateEvaluationData(model, state);
+    let numInconsistent = 0;
+    for (let constraint of this.constraints) {
+      if (!constraint.isConsistent(this.evaluationData!!)) {
+        numInconsistent++;
+      }
+    }
+    return numInconsistent;
+  }
+
+  /**
+   * Returns the number of constraints that are consistent with the given model and state.
+   *
+   * @param model model to be evaluated
+   * @param state state to be evaluated
+   */
+  getNumConsistentConstraints(model: M, state: S): number {
+    return this.constraints.length - this.getNumInconsistentConstraints(model, state);
+  }
+
+  /**
+   * Updates the data used to evaluate constraints with the new model, state and functions.
+   *
+   * @param model new model
+   * @param state new state
+   * @private
+   */
+  private updateEvaluationData(model: M, state: S) {
+    if (!this.evaluationData) {
+      this.evaluationData = {
+        model: model,
+        state: state,
+        functions: this.functions,
+      };
+    } else {
+      this.evaluationData.model = model;
+      this.evaluationData.state = state;
+      this.evaluationData.functions = this.functions;
+    }
   }
 
   /**
