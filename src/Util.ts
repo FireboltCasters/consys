@@ -27,13 +27,13 @@ export interface StatisticsReport {
   totalConstraints: number;
   consistent: {
     total: number;
-    model: { [key: string]: number };
-    state: { [key: string]: number };
+    model: {[key: string]: number};
+    state: {[key: string]: number};
   };
   inconsistent: {
     total: number;
-    model: { [key: string]: number };
-    state: { [key: string]: number };
+    model: {[key: string]: number};
+    state: {[key: string]: number};
   };
 }
 
@@ -88,7 +88,6 @@ export interface EvaluationData<M, S> {
  * Utility class.
  */
 export default class Util {
-
   /**
    * Flatten an object and inserting 0 as each value.
    *
@@ -97,10 +96,15 @@ export default class Util {
    * @param parent parent key
    * @param res resulting map
    */
-  static initCounts(object: any, count: number, parent?: string, res: { [key: string]: number } = {}): { [key: string]: number } {
+  static initCounts(
+    object: any,
+    count: number,
+    parent?: string,
+    res: {[key: string]: number} = {}
+  ): {[key: string]: number} {
     for (let key in object) {
-      let propertyName = parent ? parent + "." + key : key;
-      if (typeof object[key] == "object" && !Array.isArray(object[key])) {
+      let propertyName = parent ? parent + '.' + key : key;
+      if (typeof object[key] == 'object' && !Array.isArray(object[key])) {
         Util.initCounts(object[key], count, propertyName, res);
       } else {
         res[propertyName] = count;
