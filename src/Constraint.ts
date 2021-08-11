@@ -1,13 +1,21 @@
 import ConstraintGenerator from './ConstraintGenerator';
-import {ConstraintData, Evaluation, EvaluationData, Log} from './Util';
+import Util, {ConstraintData, Evaluation, EvaluationData, Log} from './Util';
+import {Symbols} from "./Symbols";
 
 /**
  * Represents a single constraint, with specified model and state data types.
  */
 export default class Constraint<M, S> {
+
+  // used for generation and evaluation
   private readonly generator: ConstraintGenerator;
   private readonly assertionFunction: Function;
   private readonly resource: ConstraintData;
+
+  // used for statistics analysis
+  private modelVarOccurrences: { [key: string]: number } = {};
+  private stateVarOccurrences: { [key: string]: number } = {};
+  private initializedStatistics: boolean = false;
 
   /**
    * Create a new constraint from constraint data.
@@ -19,6 +27,63 @@ export default class Constraint<M, S> {
     this.resource = resource;
     this.generator = generator;
     this.assertionFunction = this.generator.generateFunction(resource);
+  }
+
+  /**
+   * Returns the corresponding regex to find a model or state variable in a string.
+   *
+   * @param key variable key
+   * @param prefix key prefix
+   * @private
+   */
+  private static getRegexForKey(key: string, prefix: string): RegExp {
+    return new RegExp("\\" + prefix + key.replace(".", "\\.") + "(?!(\\w|\\.))", "g");
+  }
+
+  /**
+   * Returns a map from each key of the given object to the number of occurrences of that key in this constraint.
+   *
+   * @param object model or state
+   * @param prefix indicate if the object is a model or state
+   * @private
+   */
+  private countOccurrences(object: M | S, prefix: string): { [key: string]: number } {
+    let constraintString = this.resource.constraint;
+    let res: { [key: string]: number } = Util.initCounts(object, 0);
+    for (let key of Object.keys(res)) {
+      let regex = Constraint.getRegexForKey(key, prefix);
+      res[key] = constraintString.match(regex)?.length || 0;
+    }
+    return res;
+  }
+
+  /**
+   * Initializes the counts if not already done.
+   *
+   * @param model model to be counted
+   * @param state state to be counted
+   * @private
+   */
+  private initStatistics(model: M, state: S) {
+    if (!this.initializedStatistics) {
+      this.modelVarOccurrences = this.countOccurrences(model, Symbols.MODEL_PREFIX);
+      this.stateVarOccurrences = this.countOccurrences(state, Symbols.STATE_PREFIX);
+      this.initializedStatistics = true;
+    }
+  }
+
+  /**
+   * Returns a map of the number of occurrences for each key of the model.
+   */
+  getModelVarOccurrences(): { [key: string]: number } {
+    return this.modelVarOccurrences;
+  }
+
+  /**
+   * Returns a map of the number of occurrences for each key of the state.
+   */
+  getStateVarOccurrences(): { [key: string]: number } {
+    return this.stateVarOccurrences;
   }
 
   /**
@@ -59,6 +124,7 @@ export default class Constraint<M, S> {
    * @param data data to evaluate, along with functions
    */
   isConsistent(data: EvaluationData<M, S>): boolean {
+    this.initStatistics(data.model, data.state);
     return this.assertionFunction.apply(data, null);
   }
 

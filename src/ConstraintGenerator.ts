@@ -702,8 +702,17 @@ export default class ConstraintGenerator {
    * @private
    */
   private generateConditionalString(data: string): string {
-    let trimmed = data.replace(/\s/g, '');
+    let tokens = this.getTokens(data);
+    return this.getStringFromTokens(tokens);
+  }
 
+  /**
+   * Splits up the data string into logical pieces (model variables, state variables, comparisons, ...).
+   *
+   * @param data data to be split
+   */
+  getTokens(data: string): string[] {
+    let trimmed = data.replace(/\s/g, '');
     let tokens: string[] = [];
     let done = false;
     let startIndex = 0;
@@ -713,50 +722,50 @@ export default class ConstraintGenerator {
 
       // we have data access, so look for the char of the next statement to find the end index
       if (
-        startChar === Symbols.MODEL_PREFIX ||
-        startChar === Symbols.STATE_PREFIX
+          startChar === Symbols.MODEL_PREFIX ||
+          startChar === Symbols.STATE_PREFIX
       ) {
         endIndex = ConstraintGenerator.getDataAccessEndIndex(
-          trimmed,
-          startIndex,
-          endIndex
+            trimmed,
+            startIndex,
+            endIndex
         );
 
         // we have a string here, so just look for the end string quotation to find the end index
       } else if (startChar === Symbols.STRING_SYMBOL) {
         endIndex = ConstraintGenerator.getStringEndIndex(
-          trimmed,
-          startIndex,
-          endIndex
+            trimmed,
+            startIndex,
+            endIndex
         );
 
         // we have a number, so look for the next char that is not a dot or a number to find the end index
       } else if (startChar.match(/[0-9]/g)) {
         endIndex = ConstraintGenerator.getNumberEndIndex(
-          trimmed,
-          startIndex,
-          endIndex
+            trimmed,
+            startIndex,
+            endIndex
         );
 
         // we have a function, so look for the last closing bracket to find the end index
       } else if (this.isFunctionToken(trimmed.substring(startIndex))) {
         endIndex = ConstraintGenerator.getFunctionEndIndex(
-          trimmed,
-          startIndex,
-          endIndex
+            trimmed,
+            startIndex,
+            endIndex
         );
 
         // we have some sort of operator here, we must do this by hand unfortunately
       } else if (ConstraintGenerator.OPERATOR_START.includes(startChar)) {
         endIndex = ConstraintGenerator.getOperatorEndIndex(
-          trimmed,
-          startChar,
-          startIndex,
-          endIndex
+            trimmed,
+            startChar,
+            startIndex,
+            endIndex
         );
       } else {
         throw Log.error(
-          'Unable to parse expression: ' +
+            'Unable to parse expression: ' +
             data +
             ', char: ' +
             startChar +
@@ -772,8 +781,7 @@ export default class ConstraintGenerator {
         done = true;
       }
     }
-
-    return this.getStringFromTokens(tokens);
+    return tokens;
   }
 
   /**

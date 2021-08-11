@@ -240,6 +240,11 @@ test('ConstraintSystem Test', async () => {
   expect(evaluation.message).toBe('failed0');
   expect(evaluation.consistent).toBe(false);
 
+  let statistics = system.evaluateStatistics(model, state);
+  expect(statistics.totalConstraints).toBe(7);
+  expect(statistics.consistent.total).toBe(6);
+  expect(statistics.inconsistent.total).toBe(1);
+
   const constraint0 = {
     constraint: 'TRUE: FALSE',
     message: '$',

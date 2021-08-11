@@ -1,6 +1,6 @@
 import ConstraintGenerator from './ConstraintGenerator';
 import ConstraintSystemPlugin from './ConstraintSystemPlugin';
-import {
+import Util, {
   ConstraintData,
   Evaluation,
   EvaluationData,
@@ -9,7 +9,7 @@ import {
   FunctionType,
   Log,
   Report,
-  StatementType,
+  StatementType, StatisticsReport,
 } from './Util';
 import Constraint from './Constraint';
 
@@ -188,6 +188,55 @@ export default class ConstraintSystem<M, S> {
       checkedConstraints: constraintData,
       evaluation: evaluationRes,
     };
+  }
+
+  /**
+   * Accumulates the occurrences of keys in src to the keys in res.
+   *
+   * @param src src counts
+   * @param res res counts
+   * @private
+   */
+  private static accumulateOccurrences(src: { [key: string]: number }, res: { [key: string]: number }) {
+    for (let srcKey of Object.keys(src)) {
+      res[srcKey] += src[srcKey];
+    }
+  }
+
+  /**
+   * Returns statistical data about the occurrences of model and state variables in consistent or inconsistent
+   * constraints. This can be used to determine which variable has the most influence on the result.
+   *
+   * @param model model to be evaluated
+   * @param state state to be evaluated
+   */
+  evaluateStatistics(model: M, state: S): StatisticsReport {
+    let res: StatisticsReport = {
+      totalConstraints: this.constraints.length,
+      consistent: {
+        total: 0,
+        model: Util.initCounts(model, 0),
+        state: Util.initCounts(state, 0)
+      },
+      inconsistent: {
+        total: 0,
+        model: Util.initCounts(model, 0),
+        state: Util.initCounts(state, 0)
+      },
+    };
+    this.updateEvaluationData(model, state);
+    for (let constraint of this.constraints) {
+      if (constraint.isConsistent(this.evaluationData!!)) {
+        res.consistent.total++;
+        ConstraintSystem.accumulateOccurrences(constraint.getModelVarOccurrences(), res.consistent.model);
+        ConstraintSystem.accumulateOccurrences(constraint.getStateVarOccurrences(), res.consistent.state);
+      } else {
+        res.inconsistent.total++;
+        ConstraintSystem.accumulateOccurrences(constraint.getModelVarOccurrences(), res.inconsistent.model);
+        ConstraintSystem.accumulateOccurrences(constraint.getStateVarOccurrences(), res.inconsistent.state);
+      }
+    }
+    return res;
   }
 
   /**

@@ -20,6 +20,24 @@ export interface Report<M, S> {
 }
 
 /**
+ * Statistics report, containing the number of occurrences of model and state variables in consistent and
+ * inconsistent constraints, as well as the total number of constraints.
+ */
+export interface StatisticsReport {
+  totalConstraints: number;
+  consistent: {
+    total: number;
+    model: { [key: string]: number };
+    state: { [key: string]: number };
+  };
+  inconsistent: {
+    total: number;
+    model: { [key: string]: number };
+    state: { [key: string]: number };
+  };
+}
+
+/**
  * Filter by resource.
  */
 export type ResourceFilterFunction = (resource: ConstraintData) => boolean;
@@ -64,6 +82,32 @@ export interface EvaluationData<M, S> {
   model: M;
   state: S;
   functions: {[key: string]: Function};
+}
+
+/**
+ * Utility class.
+ */
+export default class Util {
+
+  /**
+   * Flatten an object and inserting 0 as each value.
+   *
+   * @param object object to be flattened
+   * @param count initial count
+   * @param parent parent key
+   * @param res resulting map
+   */
+  static initCounts(object: any, count: number, parent?: string, res: { [key: string]: number } = {}): { [key: string]: number } {
+    for (let key in object) {
+      let propertyName = parent ? parent + "." + key : key;
+      if (typeof object[key] == "object" && !Array.isArray(object[key])) {
+        Util.initCounts(object[key], count, propertyName, res);
+      } else {
+        res[propertyName] = count;
+      }
+    }
+    return res;
+  }
 }
 
 /**
