@@ -43,6 +43,7 @@
 npm install consys
 ```
 
+
 ## Quick start
 
 After the installation, you can start using it. Here is a small example to get you started:
