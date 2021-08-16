@@ -609,6 +609,9 @@ export default class ConstraintGenerator {
       } else if (endChar === Symbols.PARENTHESIS_CLOSE) {
         numBrackets--;
       }
+      if (!foundFirst && !endChar.match(/\w/g)) {
+        return i;
+      }
       if (foundFirst && numBrackets === 0) {
         end = i + 1;
         break;

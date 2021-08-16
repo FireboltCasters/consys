@@ -42,6 +42,10 @@ const constraintData = [
     id: 1,
   },
   {
+    constraint: "ALWAYS: ZERO <= LENGTH($time)",
+    message: 'failed'
+  },
+  {
     constraint: "ALWAYS: $time == '5:00'",
     message: 'failed2',
     id: 2,
@@ -214,11 +218,11 @@ test('ConstraintSystem Test', async () => {
   const report4 = system.evaluate(model, state);
 
   expect(system.getNumInconsistentConstraints(model, state)).toBe(1);
-  expect(system.getNumConsistentConstraints(model, state)).toBe(6);
-  expect(system.getNumConstraints()).toBe(7);
+  expect(system.getNumConsistentConstraints(model, state)).toBe(7);
+  expect(system.getNumConstraints()).toBe(8);
 
   expect(report0[0].evaluation.length).toBe(1);
-  expect(report1[0].evaluation.length).toBe(6);
+  expect(report1[0].evaluation.length).toBe(7);
   expect(report2[0].evaluation.length).toBe(constraintData.length + 1);
   expect(report3[0].evaluation.length).toBe(1);
   expect(report4[0].evaluation.length).toBe(constraintData.length + 1);
@@ -241,8 +245,8 @@ test('ConstraintSystem Test', async () => {
   expect(evaluation.consistent).toBe(false);
 
   let statistics = system.evaluateStatistics(model, state);
-  expect(statistics.totalConstraints).toBe(7);
-  expect(statistics.consistent.total).toBe(6);
+  expect(statistics.totalConstraints).toBe(8);
+  expect(statistics.consistent.total).toBe(7);
   expect(statistics.inconsistent.total).toBe(1);
 
   const constraint0 = {
