@@ -98,6 +98,10 @@ Output:
 
 For a more detailed look into all of the features, including the constraint syntax, custom functions, plugins and more, please have a look into the [wiki](https://github.com/FireboltCasters/consys/wiki).
 
+## Related packages
+
+You might also want to take a look at [consys-solver](https://github.com/FireboltCasters/consys-solver), which is a tool built upon consys that can find feasible models for constraint systems.
+
 ## Contributors
 
 The FireboltCasters
