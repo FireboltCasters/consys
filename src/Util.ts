@@ -125,7 +125,7 @@ export class Log {
    */
   static print(...args: any[]) {
     if (Config.DEBUG_LOG) {
-      console.log('consys: ', ...args);
+      console.log('[consys]: ', ...args);
     }
   }
 
@@ -135,6 +135,13 @@ export class Log {
    * @param msg error message
    */
   static error(msg: string): Error {
-    return Error('consys: ' + msg);
+    return Error('[consys]: Error: ' + msg);
+  }
+
+  static reportSyntaxError(where: string, message: string, position: number) {
+    const prefix = '[consys]:';
+    const what = 'Syntax error in:';
+    const whitespace = " ".repeat(position + 1);
+    console.error(`${prefix} ${what}\n${prefix} ${where}\n${prefix}${whitespace}^~~~~~ ${message}.`);
   }
 }
