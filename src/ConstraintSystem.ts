@@ -1,4 +1,3 @@
-import ConstraintGenerator from './ConstraintGenerator';
 import ConstraintSystemPlugin from './ConstraintSystemPlugin';
 import Util, {
   ConstraintData,
@@ -13,15 +12,16 @@ import Util, {
   StatisticsReport,
 } from './Util';
 import Constraint from './Constraint';
+import TextProcessor from "./dsl/TextProcessor";
 
 /**
  * A constraint system with multiple constraints and custom functions, defined for specific model and state types.
  */
 export default class ConstraintSystem<M, S> {
-  private readonly generator: ConstraintGenerator = new ConstraintGenerator();
   private readonly constraints: Constraint<M, S>[] = [];
   private readonly functions: {[key: string]: Function} = {};
   private evaluationData: EvaluationData<M, S> | null = null;
+  private updatedFunctions: boolean = true;
 
   /**
    * For a given evaluation filter type, return the corresponding function
@@ -62,7 +62,7 @@ export default class ConstraintSystem<M, S> {
    * @param resource constraint data
    */
   addConstraint(resource: ConstraintData) {
-    this.constraints.push(new Constraint(resource, this.generator));
+    this.constraints.push(new Constraint(resource));
   }
 
   /**
@@ -108,7 +108,7 @@ export default class ConstraintSystem<M, S> {
       throw Log.error('Function with name ' + name + ' is already registered');
     }
     this.functions[name] = fun;
-    this.generator.registerFunction(name);
+    this.updatedFunctions = true;
   }
 
   /**
@@ -130,6 +130,7 @@ export default class ConstraintSystem<M, S> {
       reports = [this.evaluateSingle(model, state)];
     }
     this.filterReportEvaluation(reports, include);
+    this.updatedFunctions = false;
     return reports;
   }
 
@@ -179,7 +180,7 @@ export default class ConstraintSystem<M, S> {
     let evaluationRes = [];
     this.updateEvaluationData(model, state);
     for (let constraint of this.constraints) {
-      let evaluation = constraint.evaluate(this.evaluationData!!);
+      let evaluation = constraint.evaluate(this.evaluationData!!, this.updatedFunctions);
       evaluationRes.push(evaluation);
     }
     let constraintData = this.getConstraintData();
@@ -321,7 +322,7 @@ export default class ConstraintSystem<M, S> {
    * @param state state
    */
   getMessage(msgString: string, model: M, state: S): string {
-    return this.generator.getMessage(msgString, model, state, this.functions);
+    return new TextProcessor<M, S>(msgString).process(model, state, this.functions);
   }
 
   /**

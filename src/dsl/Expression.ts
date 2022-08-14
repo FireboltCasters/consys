@@ -1,6 +1,64 @@
 import Token from "./Token";
 
+class ASTPrinter implements Expression.Visitor<string> {
+
+    print(ast: Expression.AST) {
+        return ast.root?.accept(this) || ``;
+    }
+
+    visitBinaryExpression(expression: Expression.Binary): string {
+        return this.parenthesize(expression.operator.lexeme, expression.left, expression.right);
+    }
+
+    visitGroupingExpression(expression: Expression.Grouping): string {
+        return this.parenthesize(`group`, expression.expression);
+    }
+
+    visitLiteralExpression(expression: Expression.Literal): string {
+        return expression.value.toString();
+    }
+
+    visitLogicalExpression(expression: Expression.Logical): string {
+        return this.parenthesize(expression.operator.lexeme, expression.left, expression.right);
+    }
+
+    visitUnaryExpression(expression: Expression.Unary): string {
+        return this.parenthesize(expression.operator.lexeme, expression.right);
+    }
+
+    private parenthesize(name: string, ...expressions: Expression.Expression[]) {
+        return `(${name} ${expressions.map((e) => e.accept(this)).join(` `)})`;
+    }
+
+    visitConstraintExpression(rule: Expression.Constraint): string {
+        return `(activation ${rule.activation.accept(this)} assertion ${rule.assertion.accept(this)})`;
+    }
+
+    visitFunctionExpression(rule: Expression.Function): string {
+        return this.parenthesize(rule.name.lexeme, ...rule.args);
+    }
+
+    visitVariableExpression(rule: Expression.Variable): string {
+        return `${rule.type.lexeme} ${rule.name.map((e) => e.lexeme).join(`.`)}`;
+    }
+}
+
 export namespace Expression {
+
+    export class AST {
+
+        readonly root: Expression.Expression | null;
+        readonly source: string;
+
+        constructor(root: Expression.Expression | null, source: string) {
+            this.root = root;
+            this.source = source;
+        }
+
+        toString(): string {
+            return new ASTPrinter().print(this);
+        }
+    }
 
     export interface Visitor<T> {
         visitBinaryExpression(expression: Expression.Binary): T;
@@ -8,6 +66,7 @@ export namespace Expression {
         visitFunctionExpression(expression: Expression.Function): T;
         visitGroupingExpression(expression: Expression.Grouping): T;
         visitLiteralExpression(expression: Expression.Literal): T;
+        visitLogicalExpression(expression: Expression.Logical): T;
         visitUnaryExpression(expression: Expression.Unary): T;
         visitVariableExpression(expression: Expression.Variable): T;
     }
@@ -86,6 +145,23 @@ export namespace Expression {
 
         accept<T>(visitor: Expression.Visitor<T>): T {
             return visitor.visitLiteralExpression(this);
+        }
+    }
+
+    export class Logical implements Expression {
+
+        readonly left: Expression;
+        readonly operator: Token;
+        readonly right: Expression;
+
+        constructor(left: Expression, operator: Token, right: Expression) {
+            this.left = left;
+            this.operator = operator;
+            this.right = right;
+        }
+
+        accept<T>(visitor: Expression.Visitor<T>): T {
+            return visitor.visitLogicalExpression(this);
         }
     }
 

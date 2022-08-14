@@ -1,13 +1,18 @@
-import ConstraintGenerator from './ConstraintGenerator';
 import Util, {ConstraintData, Evaluation, EvaluationData, Log} from './Util';
 import {Symbols} from './Symbols';
+import Lexer from "./dsl/Lexer";
+import Parser from "./dsl/Parser";
+import Emitter from "./dsl/Emitter";
+import FunctionGenerator from "./ignoreCoverage/FunctionGenerator";
+import {Expression} from "./dsl/Expression";
+import TextProcessor from "./dsl/TextProcessor";
 
 /**
  * Represents a single constraint, with specified model and state data types.
  */
 export default class Constraint<M, S> {
-  // used for generation and evaluation
-  private readonly generator: ConstraintGenerator;
+
+  private readonly textProcessor: TextProcessor<M, S>;
   private readonly assertionFunction: Function;
   private readonly resource: ConstraintData;
 
@@ -16,16 +21,23 @@ export default class Constraint<M, S> {
   private stateVarOccurrences: {[key: string]: number} = {};
   private initializedStatistics: boolean = false;
 
+  private readonly ast: Expression.AST;
+
   /**
    * Create a new constraint from constraint data.
    *
    * @param resource constraint data
-   * @param generator constraint generator instance
    */
-  constructor(resource: ConstraintData, generator: ConstraintGenerator) {
+  constructor(resource: ConstraintData) {
     this.resource = resource;
-    this.generator = generator;
-    this.assertionFunction = this.generator.generateFunction(resource);
+    this.textProcessor = new TextProcessor(!!resource.message ? resource.message : "");
+
+    let source = resource.constraint;
+    let tokens = new Lexer(source).scan();
+    this.ast = new Parser(source, tokens).parse();
+
+    let js = new Emitter(this.ast).emit();
+    this.assertionFunction = FunctionGenerator.generateFromString(js);
   }
 
   /**
@@ -101,8 +113,9 @@ export default class Constraint<M, S> {
    * Evaluate this constraint with a given model and state, along with custom functions.
    *
    * @param data data to evaluate, along with functions
+   * @param rescan determine if the text processor should rescan if something has changed
    */
-  evaluate(data: EvaluationData<M, S>): Evaluation {
+  evaluate(data: EvaluationData<M, S>, rescan: boolean): Evaluation {
     try {
       let consistent = this.isConsistent(data);
       return {
@@ -110,12 +123,7 @@ export default class Constraint<M, S> {
         message:
           consistent || !this.resource.message
             ? ''
-            : this.generator.getMessage(
-                this.resource.message,
-                data.model,
-                data.state,
-                data.functions
-              ),
+            : this.textProcessor.process(data.model, data.state, data.functions, rescan),
         resource: this.resource,
       };
     } catch (error) {

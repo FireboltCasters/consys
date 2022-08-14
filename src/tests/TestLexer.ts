@@ -23,43 +23,43 @@ test('Lexer throws error on unterminated strings', () => {
 });
 
 test('Lexer correctly identifies all tokens', () => {
-    const expectedTokens: { type: TokenType, lexeme: string, position?: number }[] = [
-        { type: TokenType.PARENTHESIS_OPEN,         lexeme: "(" },
-        { type: TokenType.PARENTHESIS_CLOSE,        lexeme: ")" },
-        { type: TokenType.PLUS,                     lexeme: "+" },
-        { type: TokenType.MINUS,                    lexeme: "-" },
-        { type: TokenType.COMMA,                    lexeme: "," },
-        { type: TokenType.DOT,                      lexeme: "." },
-        { type: TokenType.COLON,                    lexeme: ":" },
-        { type: TokenType.SLASH,                    lexeme: "/" },
-        { type: TokenType.STAR,                     lexeme: "*" },
-        { type: TokenType.PERCENT,                  lexeme: "%" },
-        { type: TokenType.DOLLAR,                   lexeme: "$" },
-        { type: TokenType.HASH,                     lexeme: "#" },
-        { type: TokenType.EXCLAMATION_MARK,         lexeme: "!" },
-        { type: TokenType.EXCLAMATION_MARK_EQUAL,   lexeme: "!=" },
-        { type: TokenType.EQUAL_EQUAL,              lexeme: "==" },
-        { type: TokenType.GREATER,                  lexeme: ">" },
-        { type: TokenType.GREATER_EQUAL,            lexeme: ">=" },
-        { type: TokenType.LESS,                     lexeme: "<" },
-        { type: TokenType.LESS_EQUAL,               lexeme: "<=" },
-        { type: TokenType.PIPE_PIPE,                lexeme: "||" },
-        { type: TokenType.AMPERSAND_AMPERSAND,      lexeme: "&&" },
-        { type: TokenType.IDENTIFIER,               lexeme: "TEST" },
-        { type: TokenType.IDENTIFIER,               lexeme: "A_b_C" },
-        { type: TokenType.IDENTIFIER,               lexeme: "__42" },
-        { type: TokenType.STRING,                   lexeme: "'Test'" },
-        { type: TokenType.STRING,                   lexeme: "'(Test)'" },
-        { type: TokenType.STRING,                   lexeme: "'$ident._42'" },
-        { type: TokenType.NUMBER,                   lexeme: "42" },
-        { type: TokenType.NUMBER,                   lexeme: "42.43" },
-        { type: TokenType.NUMBER,                   lexeme: "43.00000001" },
-        { type: TokenType.ALWAYS,                   lexeme: "ALWAYS" },
-        { type: TokenType.WHEN,                     lexeme: "WHEN" },
-        { type: TokenType.AND,                      lexeme: "AND" },
-        { type: TokenType.OR,                       lexeme: "OR" },
-        { type: TokenType.NOT,                      lexeme: "NOT" },
-        { type: TokenType.EOF,                      lexeme: "" },
+    const expectedTokens: { type: TokenType, lexeme: string, literal: any, position?: number }[] = [
+        { type: TokenType.PARENTHESIS_OPEN,         lexeme: "(",            literal: null },
+        { type: TokenType.PARENTHESIS_CLOSE,        lexeme: ")",            literal: null },
+        { type: TokenType.PLUS,                     lexeme: "+",            literal: null },
+        { type: TokenType.MINUS,                    lexeme: "-",            literal: null },
+        { type: TokenType.COMMA,                    lexeme: ",",            literal: null },
+        { type: TokenType.DOT,                      lexeme: ".",            literal: null },
+        { type: TokenType.COLON,                    lexeme: ":",            literal: null },
+        { type: TokenType.SLASH,                    lexeme: "/",            literal: null },
+        { type: TokenType.STAR,                     lexeme: "*",            literal: null },
+        { type: TokenType.PERCENT,                  lexeme: "%",            literal: null },
+        { type: TokenType.DOLLAR,                   lexeme: "$",            literal: null },
+        { type: TokenType.HASH,                     lexeme: "#",            literal: null },
+        { type: TokenType.EXCLAMATION_MARK,         lexeme: "!",            literal: null },
+        { type: TokenType.EXCLAMATION_MARK_EQUAL,   lexeme: "!=",           literal: null },
+        { type: TokenType.EQUAL_EQUAL,              lexeme: "==",           literal: null },
+        { type: TokenType.GREATER,                  lexeme: ">",            literal: null },
+        { type: TokenType.GREATER_EQUAL,            lexeme: ">=",           literal: null },
+        { type: TokenType.LESS,                     lexeme: "<",            literal: null },
+        { type: TokenType.LESS_EQUAL,               lexeme: "<=",           literal: null },
+        { type: TokenType.PIPE_PIPE,                lexeme: "||",           literal: null },
+        { type: TokenType.AMPERSAND_AMPERSAND,      lexeme: "&&",           literal: null },
+        { type: TokenType.IDENTIFIER,               lexeme: "TEST",         literal: null },
+        { type: TokenType.IDENTIFIER,               lexeme: "A_b_C",        literal: null },
+        { type: TokenType.IDENTIFIER,               lexeme: "__42",         literal: null },
+        { type: TokenType.STRING,                   lexeme: "'Test'",       literal: "Test" },
+        { type: TokenType.STRING,                   lexeme: "'(Test)'",     literal: "(Test)" },
+        { type: TokenType.STRING,                   lexeme: "'$ident._42'", literal: "$ident._42" },
+        { type: TokenType.NUMBER,                   lexeme: "42",           literal: 42 },
+        { type: TokenType.NUMBER,                   lexeme: "42.43",        literal: 42.43 },
+        { type: TokenType.NUMBER,                   lexeme: "43.00000001",  literal: 43.00000001 },
+        { type: TokenType.ALWAYS,                   lexeme: "ALWAYS",       literal: true },
+        { type: TokenType.WHEN,                     lexeme: "WHEN",         literal: null },
+        { type: TokenType.AND,                      lexeme: "AND",          literal: null },
+        { type: TokenType.OR,                       lexeme: "OR",           literal: null },
+        { type: TokenType.NOT,                      lexeme: "NOT",          literal: null },
+        { type: TokenType.EOF,                      lexeme: "",             literal: null },
     ];
     const whitespace = ["\n", " ", "\t", "\r"];
     let source = '';
@@ -85,6 +85,7 @@ test('Lexer correctly identifies all tokens', () => {
         } else {
             expect(expected.lexeme).toBe(got.lexeme);
         }
+        expect(expected.literal).toBe(got.literal);
         expect(expected.position).toBe(got.position);
     }
 });

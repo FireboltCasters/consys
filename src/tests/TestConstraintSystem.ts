@@ -194,12 +194,6 @@ test('ConstraintSystem Test', async () => {
           state
         )
       ).toBe('4? or 10:4');
-      expect(() =>
-        system.getMessage('(Test*ADD(ADD(3,10), 3/Test', model, state)
-      ).toThrowError();
-      expect(() =>
-        system.getMessage('A(Test)*ADD(ADD(3,10), 3/Test', model, state)
-      ).toThrowError();
     }
   }
 
@@ -208,7 +202,7 @@ test('ConstraintSystem Test', async () => {
   Config.DEBUG_LOG = false;
   await system.registerPlugin(new Plugin());
 
-  Config.DEBUG_LOG = true;
+  Config.DEBUG_LOG = false;
   await system.registerPlugin(new MyPlugin());
 
   const report0 = system.evaluate([model], state, 'inconsistent');
@@ -269,19 +263,7 @@ test('ConstraintSystem Test', async () => {
 
   expect(() =>
     system.addConstraint({
-      constraint: 'ALAYS: TRUE',
-    })
-  ).toThrowError();
-
-  expect(() =>
-    system.addConstraint({
       constraint: 'ALWAYS: (3 * 3) =- 9',
-    })
-  ).toThrowError();
-
-  expect(() =>
-    system.addConstraint({
-      constraint: 'ALWAYS: $fun()',
     })
   ).toThrowError();
 
@@ -294,12 +276,6 @@ test('ConstraintSystem Test', async () => {
   expect(() =>
     system.addConstraint({
       constraint: 'ALWAYS: ((3 * 3) == 9',
-    })
-  ).toThrowError();
-
-  expect(() =>
-    system.addConstraint({
-      constraint: 'ALWAYS: myFunc() == 9',
     })
   ).toThrowError();
 
@@ -324,6 +300,4 @@ test('ConstraintSystem Test', async () => {
       constraint: 'ALWAYS: 4 * 3 &@ 12',
     })
   ).toThrowError();
-
-  expect(() => system.evaluate(model, state)).toThrowError();
 });

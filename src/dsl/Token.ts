@@ -46,11 +46,13 @@ export default class Token {
 
     readonly type: TokenType;
     readonly lexeme: string;
+    readonly literal: any;
     readonly position: number;
 
-    constructor(type: TokenType, lexeme: string, position: number) {
+    constructor(type: TokenType, lexeme: string, literal: any, position: number) {
         this.type = type;
         this.lexeme = lexeme;
+        this.literal = literal;
         this.position = position;
     }
 

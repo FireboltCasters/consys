@@ -40,11 +40,13 @@ export default class Lexer {
 
     private readonly tokens: Token[]    = [];
     private readonly source: string     = "";
+    private readonly offset: number     = 0;
     private start: number               = 0;
     private current: number             = 0;
 
-    constructor(source: string) {
+    constructor(source: string, offset: number = 0) {
         this.source = source;
+        this.offset = offset;
     }
 
     scan(): Token[] {
@@ -52,7 +54,7 @@ export default class Lexer {
             this.start = this.current;
             this.scanToken();
         }
-        this.tokens.push(new Token(TokenType.EOF, "", this.source.length));
+        this.tokens.push(new Token(TokenType.EOF, "", null, this.source.length + this.offset));
         return this.tokens;
     }
 
@@ -121,7 +123,9 @@ export default class Lexer {
         }
         // we are on the enclosing quote, so go to the next symbol
         this.advance();
-        this.emitToken(TokenType.STRING, this.start + 1, this.current - 1, this.start);
+        const begin = this.start + 1;
+        const end = this.current - 1;
+        this.emitToken(TokenType.STRING, this.source.substring(begin, end), begin, end, this.start);
     }
 
     private handleNumber() {
@@ -135,7 +139,8 @@ export default class Lexer {
                 this.advance();
             }
         }
-        this.emitToken(TokenType.NUMBER);
+        const number: string = this.source.substring(this.start, this.current);
+        this.emitToken(TokenType.NUMBER, Number.parseFloat(number));
     }
 
     private handleIdentifier() {
@@ -147,7 +152,7 @@ export default class Lexer {
         if (!type) {
             type = TokenType.IDENTIFIER;
         }
-        this.emitToken(type);
+        this.emitToken(type, type === TokenType.ALWAYS ? true : null);
     }
 
     private isAtEnd(): boolean {
@@ -183,12 +188,12 @@ export default class Lexer {
         return this.source.charAt(this.current + 1);
     }
 
-    private emitToken(type: TokenType, begin: number = this.start, end: number = this.current, position: number = begin) {
-        this.tokens.push(new Token(type, this.source.substring(begin, end), position));
+    private emitToken(type: TokenType, literal: any = null, begin: number = this.start, end: number = this.current, position: number = begin) {
+        this.tokens.push(new Token(type, this.source.substring(begin, end), literal, position + this.offset));
     }
 
     private errorOnPosition(message: string, position: number = this.current - 1): Error {
-        Log.reportSyntaxError(this.source, message, position);
+        Log.reportError("Syntax", this.source, message, position + this.offset);
         return Error();
     }
 }

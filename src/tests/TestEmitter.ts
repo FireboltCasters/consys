@@ -12,7 +12,7 @@ const emitFromSource: (source: string) => string = (source: string) => {
 };
 
 test('Emitter returns empty string with no provided ast', () => {
-    const emitter = new Emitter(null);
+    const emitter = new Emitter({root: null, source: ""});
     expect(emitter.emit()).toBe('');
 });
 

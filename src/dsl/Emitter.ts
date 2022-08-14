@@ -3,29 +3,18 @@ import {TokenType} from "./Token";
 
 export default class Emitter implements Expression.Visitor<string> {
 
-    private readonly ast: Expression.Expression | null;
+    private readonly ast: Expression.AST;
 
-    constructor(ast: Expression.Expression | null) {
+    constructor(ast: Expression.AST) {
         this.ast = ast;
     }
 
     emit(): string {
-        return this.ast?.accept(this) || "";
+        return this.ast.root?.accept(this) || "";
     }
 
     visitBinaryExpression(rule: Expression.Binary): string {
-        let left = rule.left.accept(this);
-        let right = rule.right.accept(this);
-        let operator: string = `${rule.operator.lexeme}`;
-        switch (rule.operator.type) {
-            case TokenType.OR:
-                operator = `||`;
-                break;
-            case TokenType.AND:
-                operator = `&&`;
-                break;
-        }
-        return `${left}${operator}${right}`;
+        return `${rule.left.accept(this)}${rule.operator.lexeme}${rule.right.accept(this)}`;
     }
 
     visitConstraintExpression(rule: Expression.Constraint): string {
@@ -56,6 +45,19 @@ export default class Emitter implements Expression.Visitor<string> {
                 return `true`;
         }
         return `this.functions['${rule.value.lexeme}'](this.model,this.state)`;
+    }
+
+    visitLogicalExpression(rule: Expression.Logical): string {
+        let operator: string = `${rule.operator.lexeme}`;
+        switch (rule.operator.type) {
+            case TokenType.OR:
+                operator = `||`;
+                break;
+            case TokenType.AND:
+                operator = `&&`;
+                break;
+        }
+        return `${rule.left.accept(this)}${operator}${rule.right.accept(this)}`;
     }
 
     visitUnaryExpression(rule: Expression.Unary): string {

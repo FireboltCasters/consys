@@ -54,11 +54,44 @@ export default class Parser {
         this.tokens = tokens;
     }
 
-    parse(): Expression.Expression | null {
+    parse(): Expression.AST {
+        return this.run(() => this.constraint(), `Expected constraint`);
+    }
+
+    parseModel(): Expression.AST {
+        return this.run(() => {
+            this.advance();
+            return this.variable();
+        }, `Expected model`);
+    }
+
+    parseState(): Expression.AST {
+        return this.run(() => {
+            this.advance();
+            return this.variable();
+        }, `Expected state`);
+    }
+
+    parseFunction(): Expression.AST {
+        return this.run(() => {
+            this.advance();
+            return this.functionCall();
+        }, `Expected function`);
+    }
+
+    parseFunctionExpr(): Expression.AST {
+        return this.run(() => {
+            this.advance();
+            return this.functionExpr();
+        }, `Expected function expression`);
+    }
+
+    private run(start: () => Expression.Expression, emptyMessage: string): Expression.AST {
         if (this.tokens.length === 1) {
-            throw this.syntaxErrorOnToken(this.peek(), `Expected constraint`);
+            throw this.syntaxErrorOnToken(this.peek(), emptyMessage);
         }
-        return this.constraint();
+        const root = start();
+        return new Expression.AST(root, this.source);
     }
 
     private constraint(): Expression.Expression {
@@ -97,6 +130,7 @@ export default class Parser {
 
     private disjunction(): Expression.Expression {
         return this.parseLeftAssociativeBinaryOperator(
+            true,
             () => this.conjunction(),
             TokenType.PIPE_PIPE, TokenType.OR
         );
@@ -104,6 +138,7 @@ export default class Parser {
 
     private conjunction(): Expression.Expression {
         return this.parseLeftAssociativeBinaryOperator(
+            true,
             () => this.equality(),
             TokenType.AMPERSAND_AMPERSAND, TokenType.AND
         );
@@ -125,6 +160,7 @@ export default class Parser {
 
     private term(): Expression.Expression {
         return this.parseLeftAssociativeBinaryOperator(
+            false,
             () => this.factor(),
             TokenType.PLUS, TokenType.MINUS
         );
@@ -132,6 +168,7 @@ export default class Parser {
 
     private factor(): Expression.Expression {
         return this.parseLeftAssociativeBinaryOperator(
+            false,
             () => this.unary(),
             TokenType.STAR, TokenType.SLASH, TokenType.PERCENT
         );
@@ -177,13 +214,8 @@ export default class Parser {
         return new Expression.Variable(type, name);
     }
 
-    private identifier(): Expression.Expression {
-        let value = this.advance();
-        return new Expression.Literal(value);
-    }
-
     private functionCall(): Expression.Expression {
-        let name = this.previous();
+        const name = this.previous();
         let args: Expression.Expression[] = [];
         if (this.matchAny(TokenType.PARENTHESIS_OPEN)) {
             args = this.args();
@@ -193,7 +225,7 @@ export default class Parser {
     }
 
     private args(): Expression.Expression[] {
-        let args: Expression.Expression[] = [];
+        const args: Expression.Expression[] = [];
         if (this.check(TokenType.PARENTHESIS_CLOSE)) {
             return args;
         }
@@ -205,10 +237,12 @@ export default class Parser {
     }
 
     private functionExpr(): Expression.Expression {
-        return this.identifier();
+        const name = this.advance();
+        return new Expression.Function(name, []);
     }
 
     private parseLeftAssociativeBinaryOperator(
+        logical: boolean,
         production: () => Expression.Expression,
         ...operators: TokenType[]
     ): Expression.Expression {
@@ -216,7 +250,11 @@ export default class Parser {
         while (this.matchAny(...operators)) {
             let operator = this.previous();
             let right = production();
-            expression = new Expression.Binary(expression, operator, right);
+            if (logical) {
+                expression = new Expression.Logical(expression, operator, right);
+            } else {
+                expression = new Expression.Binary(expression, operator, right);
+            }
         }
         return expression;
     }
@@ -278,7 +316,7 @@ export default class Parser {
     }
 
     private syntaxErrorOnToken(token: Token, message: string): Error {
-        Log.reportSyntaxError(this.source, message, token.position);
+        Log.reportError("Syntax", this.source, message, token.position);
         return Error();
     }
 }
