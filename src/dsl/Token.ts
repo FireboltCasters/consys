@@ -1,4 +1,6 @@
-
+/**
+ * All possible words of the dsl.
+ */
 export enum TokenType {
 
     // single character tokens
@@ -42,6 +44,9 @@ export enum TokenType {
     EOF,
 }
 
+/**
+ * Represents a word of the dsl.
+ */
 export default class Token {
 
     readonly type: TokenType;
@@ -49,6 +54,14 @@ export default class Token {
     readonly literal: any;
     readonly position: number;
 
+    /**
+     * Creates a new token from data.
+     *
+     * @param type token type
+     * @param lexeme token source
+     * @param literal token value
+     * @param position token position
+     */
     constructor(type: TokenType, lexeme: string, literal: any, position: number) {
         this.type = type;
         this.lexeme = lexeme;
@@ -56,6 +69,9 @@ export default class Token {
         this.position = position;
     }
 
+    /**
+     * Returns the string representation of this token.
+     */
     toString(): string {
         return "([" + TokenType[this.type] + "] " + "'" + this.lexeme + "'" + ")";
     }

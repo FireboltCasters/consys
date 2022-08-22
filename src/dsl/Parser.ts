@@ -3,7 +3,8 @@ import {Expression} from "./Expression";
 import {Log} from "../Util";
 
 /**
- * Syntax definition for constraints.
+ * This class transforms a given list of tokens into an abstract syntax tree mirroring the dsl grammar.
+ * Syntax definition for constraints:
  *
  * constraint      ->  activation ":" assertion ;
  * activation      ->  "ALWAYS" | "WHEN" expression | functionExpr ;
@@ -45,19 +46,32 @@ import {Log} from "../Util";
  */
 export default class Parser {
 
+    // parser state
     private readonly source: string;
     private readonly tokens: Token[];
     private current: number = 0;
 
+    /**
+     * Creates a new parser instance from a given string of source code and a list of tokens.
+     *
+     * @param source source code
+     * @param tokens list of tokens
+     */
     constructor(source: string, tokens: Token[]) {
         this.source = source;
         this.tokens = tokens;
     }
 
+    /**
+     * Returns the ast for the given token list for a constraint.
+     */
     parse(): Expression.AST {
         return this.run(() => this.constraint(), `Expected constraint`);
     }
 
+    /**
+     * Returns the ast for the given token list for a model.
+     */
     parseModel(): Expression.AST {
         return this.run(() => {
             this.advance();
@@ -65,6 +79,9 @@ export default class Parser {
         }, `Expected model`);
     }
 
+    /**
+     * Returns the ast for the given token list for a state.
+     */
     parseState(): Expression.AST {
         return this.run(() => {
             this.advance();
@@ -72,6 +89,9 @@ export default class Parser {
         }, `Expected state`);
     }
 
+    /**
+     * Returns the ast for the given token list for a function.
+     */
     parseFunction(): Expression.AST {
         return this.run(() => {
             this.advance();
@@ -79,6 +99,9 @@ export default class Parser {
         }, `Expected function`);
     }
 
+    /**
+     * Returns the ast for the given token list for a function expression.
+     */
     parseFunctionExpr(): Expression.AST {
         return this.run(() => {
             this.advance();
@@ -86,6 +109,13 @@ export default class Parser {
         }, `Expected function expression`);
     }
 
+    /**
+     * Starts the parsing algorithm with a given starting rule.
+     *
+     * @param start starting rule
+     * @param emptyMessage error message if an empty list is given (single eof token)
+     * @private
+     */
     private run(start: () => Expression.Expression, emptyMessage: string): Expression.AST {
         if (this.tokens.length === 1) {
             throw this.syntaxErrorOnToken(this.peek(), emptyMessage);
@@ -94,6 +124,11 @@ export default class Parser {
         return new Expression.AST(root, this.source);
     }
 
+    /**
+     * Matches this rule:
+     * constraint      ->  activation ":" assertion ;
+     * @private
+     */
     private constraint(): Expression.Expression {
         let activation = this.activation();
         this.consume(TokenType.COLON, "Expected ':' after activation");
@@ -106,6 +141,11 @@ export default class Parser {
         return new Expression.Constraint(activation, assertion);
     }
 
+    /**
+     * Matches this rule:
+     * activation      ->  "ALWAYS" | "WHEN" expression | functionExpr ;
+     * @private
+     */
     private activation(): Expression.Expression {
         if (this.matchAny(TokenType.ALWAYS, TokenType.WHEN)) {
             let operator = this.previous();
@@ -120,14 +160,29 @@ export default class Parser {
         return this.functionExpr();
     }
 
+    /**
+     * Matches this rule:
+     * assertion       ->  expression ;
+     * @private
+     */
     private assertion(): Expression.Expression {
         return this.expression();
     }
 
+    /**
+     * Matches this rule:
+     * expression      ->  disjunction ;
+     * @private
+     */
     private expression(): Expression.Expression {
         return this.disjunction();
     }
 
+    /**
+     * Matches this rule:
+     * disjunction     ->  conjunction ( ( "||" | "OR" ) conjunction )* ;
+     * @private
+     */
     private disjunction(): Expression.Expression {
         return this.parseLeftAssociativeBinaryOperator(
             true,
@@ -136,6 +191,11 @@ export default class Parser {
         );
     }
 
+    /**
+     * Matches this rule:
+     * conjunction     ->  equality ( ( "&&" | "AND" ) equality )* ;
+     * @private
+     */
     private conjunction(): Expression.Expression {
         return this.parseLeftAssociativeBinaryOperator(
             true,
@@ -144,6 +204,11 @@ export default class Parser {
         );
     }
 
+    /**
+     * Matches this rule:
+     * equality        ->  comparison ( ( "==" | "!=" ) comparison )? ;
+     * @private
+     */
     private equality(): Expression.Expression {
         return this.parseLeftAssociativeOptionalBinaryOperator(
             () => this.comparison(),
@@ -151,6 +216,11 @@ export default class Parser {
         );
     }
 
+    /**
+     * Matches this rule:
+     * comparison      ->  term ( ( "<" | "<=" | ">=" | ">" ) term )? ;
+     * @private
+     */
     private comparison(): Expression.Expression {
         return this.parseLeftAssociativeOptionalBinaryOperator(
             () => this.term(),
@@ -158,6 +228,11 @@ export default class Parser {
         );
     }
 
+    /**
+     * Matches this rule:
+     * term            ->  factor ( ( "+" | "-" ) factor )* ;
+     * @private
+     */
     private term(): Expression.Expression {
         return this.parseLeftAssociativeBinaryOperator(
             false,
@@ -166,6 +241,11 @@ export default class Parser {
         );
     }
 
+    /**
+     * Matches this rule:
+     * factor          ->  unary ( ( "*" | "/" | "%" ) unary )* ;
+     * @private
+     */
     private factor(): Expression.Expression {
         return this.parseLeftAssociativeBinaryOperator(
             false,
@@ -174,6 +254,11 @@ export default class Parser {
         );
     }
 
+    /**
+     * Matches this rule:
+     * unary           ->  ( "!" | "-" | "NOT" ) unary | primary ;
+     * @private
+     */
     private unary(): Expression.Expression {
         if (this.matchAny(TokenType.EXCLAMATION_MARK, TokenType.MINUS, TokenType.NOT)) {
             let operator = this.previous();
@@ -183,6 +268,11 @@ export default class Parser {
         return this.primary();
     }
 
+    /**
+     * Matches this rule:
+     * primary         ->  number | string | variable | function | "(" expression ")" ;
+     * @private
+     */
     private primary(): Expression.Expression {
         if (this.matchAny(TokenType.IDENTIFIER)) {
             return this.functionCall();
@@ -201,6 +291,14 @@ export default class Parser {
         throw this.syntaxErrorOnToken(this.peek(), "Expected expression");
     }
 
+    /**
+     * Matches this rule:
+     * variable        ->  model | state ;
+     * model           ->  "$" ( nested )? ;
+     * state           ->  "#" ( nested )? ;
+     * nested          ->  identifier ( "." identifier )* ;
+     * @private
+     */
     private variable(): Expression.Expression {
         let type = this.previous();
         let name: Token[] = [];
@@ -214,6 +312,11 @@ export default class Parser {
         return new Expression.Variable(type, name);
     }
 
+    /**
+     * Matches this rule:
+     * function        ->  functionExpr | identifier "(" ( arguments )? ")" ;
+     * @private
+     */
     private functionCall(): Expression.Expression {
         const name = this.previous();
         let args: Expression.Expression[] = [];
@@ -224,6 +327,11 @@ export default class Parser {
         return new Expression.Function(name, args);
     }
 
+    /**
+     * Matches this rule:
+     * arguments       ->  expression ( "," expression )* ;
+     * @private
+     */
     private args(): Expression.Expression[] {
         const args: Expression.Expression[] = [];
         if (this.check(TokenType.PARENTHESIS_CLOSE)) {
@@ -236,11 +344,25 @@ export default class Parser {
         return args;
     }
 
+    /**
+     * Matches this rule:
+     * functionExpr    ->  identifier ;
+     * @private
+     */
     private functionExpr(): Expression.Expression {
         const name = this.advance();
         return new Expression.Function(name, []);
     }
 
+    /**
+     * Parses a rule with the following format:
+     * rule     ->  production ( ( operators[0] | operators[1] | ... ) production )* ;
+     *
+     * @param logical true if currently parsing a logical expression
+     * @param production production function pointer
+     * @param operators binary operators of this rule
+     * @private
+     */
     private parseLeftAssociativeBinaryOperator(
         logical: boolean,
         production: () => Expression.Expression,
@@ -259,6 +381,14 @@ export default class Parser {
         return expression;
     }
 
+    /**
+     * Parses a rule with the following format:
+     * rule     ->  production ( ( operators[0] | operators[1] | ... ) production )? ;
+     *
+     * @param production production function pointer
+     * @param operators binary operators of this rule
+     * @private
+     */
     private parseLeftAssociativeOptionalBinaryOperator(
         production: () => Expression.Expression,
         ...operators: TokenType[]
@@ -272,6 +402,12 @@ export default class Parser {
         return expression;
     }
 
+    /**
+     * Consumes the current token if any of the given token types matches the current token.
+     *
+     * @param types token types to match
+     * @private
+     */
     private matchAny(...types: TokenType[]): boolean {
         for (let type of types) {
             if (this.check(type)) {
@@ -282,6 +418,13 @@ export default class Parser {
         return false;
     }
 
+    /**
+     * Consumes the current token.
+     *
+     * @param type token type
+     * @param message error message if current token is not of given type
+     * @private
+     */
     private consume(type: TokenType, message: string): Token {
         if (this.check(type)) {
             return this.advance();
@@ -289,6 +432,12 @@ export default class Parser {
         throw this.syntaxErrorOnToken(this.peek(), message);
     }
 
+    /**
+     * Check if the current token is of the given type.
+     *
+     * @param type token type to check
+     * @private
+     */
     private check(type: TokenType): boolean {
         if (this.isAtEnd()) {
             return false;
@@ -296,6 +445,10 @@ export default class Parser {
         return this.peek().type === type;
     }
 
+    /**
+     * Consumes the current token.
+     * @private
+     */
     private advance(): Token {
         if (!this.isAtEnd()) {
             this.current++;
@@ -303,18 +456,37 @@ export default class Parser {
         return this.previous();
     }
 
+    /**
+     * Checks if the parser is done.
+     * @private
+     */
     private isAtEnd(): boolean {
         return this.peek().type === TokenType.EOF;
     }
 
+    /**
+     * Returns the current token.
+     * @private
+     */
     private peek(): Token {
         return this.tokens[this.current];
     }
 
+    /**
+     * Returns the previous token.
+     * @private
+     */
     private previous(): Token {
         return this.tokens[this.current - 1];
     }
 
+    /**
+     * Prints an error message and then throws an error.
+     *
+     * @param token token where the error occurred
+     * @param message error message
+     * @private
+     */
     private syntaxErrorOnToken(token: Token, message: string): Error {
         Log.reportError("Syntax", this.source, message, token.position);
         return Error();

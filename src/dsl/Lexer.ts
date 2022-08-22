@@ -1,8 +1,12 @@
 import Token, {TokenType} from "./Token";
 import {Log} from "../Util";
 
+/**
+ * The lexer is responsible for reading in source code of the dsl and turn it into a list of meaningful tokens.
+ */
 export default class Lexer {
 
+    // all tokens that have a single character
     private static readonly singleCharTokens: { [key: string]: TokenType } = {
         "(":        TokenType.PARENTHESIS_OPEN,
         ")":        TokenType.PARENTHESIS_CLOSE,
@@ -18,6 +22,7 @@ export default class Lexer {
         "#":        TokenType.HASH
     };
 
+    // all keywords
     private static readonly keywords: { [key: string]: TokenType } = {
         "ALWAYS":   TokenType.ALWAYS,
         "WHEN":     TokenType.WHEN,
@@ -26,29 +31,57 @@ export default class Lexer {
         "NOT":      TokenType.NOT
     };
 
+    /**
+     * Checks if the given symbol is a digit from 0-9.
+     *
+     * @param symbol character to check
+     * @private
+     */
     private static isDigit(symbol: string): boolean {
         return !!symbol.match(/\d/);
     }
 
+    /**
+     * Checks if the given symbol is an alphabetic lower- or uppercase value.
+     *
+     * @param symbol character to check
+     * @private
+     */
     private static isAlpha(symbol: string): boolean {
         return !!symbol.match(/[a-zA-Z]|_/);
     }
 
+    /**
+     * Checks if the given symbol is either a digit or alphabetic.
+     *
+     * @param symbol character to check
+     * @private
+     */
     private static isAlphaNumeric(symbol: string): boolean {
         return Lexer.isDigit(symbol) || Lexer.isAlpha(symbol);
     }
 
+    // lexer state
     private readonly tokens: Token[]    = [];
     private readonly source: string     = "";
     private readonly offset: number     = 0;
     private start: number               = 0;
     private current: number             = 0;
 
+    /**
+     * Creates a new lexer instance for a given string of source code
+     *
+     * @param source source code
+     * @param offset index offset into the source code
+     */
     constructor(source: string, offset: number = 0) {
         this.source = source;
         this.offset = offset;
     }
 
+    /**
+     * Scans the source code and turns it into a list of tokens.
+     */
     scan(): Token[] {
         while (!this.isAtEnd()) {
             this.start = this.current;
@@ -58,6 +91,10 @@ export default class Lexer {
         return this.tokens;
     }
 
+    /**
+     * Scans a single token on the current index.
+     * @private
+     */
     private scanToken() {
         let currentSymbol = this.advance();
         if (Lexer.singleCharTokens[currentSymbol] !== undefined) {
@@ -113,6 +150,10 @@ export default class Lexer {
         }
     }
 
+    /**
+     * Should the lexer come to a single quote char, it interprets as a string the next symbols until the next quote.
+     * @private
+     */
     private handleString() {
         // ignore symbols until we find the matching quote
         while (this.peek() !== "'" && !this.isAtEnd()) {
@@ -128,6 +169,10 @@ export default class Lexer {
         this.emitToken(TokenType.STRING, this.source.substring(begin, end), begin, end, this.start);
     }
 
+    /**
+     * Scans a number token.
+     * @private
+     */
     private handleNumber() {
         while (Lexer.isDigit(this.peek())) {
             this.advance();
@@ -143,6 +188,10 @@ export default class Lexer {
         this.emitToken(TokenType.NUMBER, Number.parseFloat(number));
     }
 
+    /**
+     * Scans an identifier token.
+     * @private
+     */
     private handleIdentifier() {
         while (Lexer.isAlphaNumeric(this.peek())) {
             this.advance();
@@ -155,14 +204,27 @@ export default class Lexer {
         this.emitToken(type, type === TokenType.ALWAYS ? true : null);
     }
 
+    /**
+     * Checks if the lexer is done scanning.
+     * @private
+     */
     private isAtEnd(): boolean {
         return this.current >= this.source.length;
     }
 
+    /**
+     * Consume the current symbol.
+     * @private
+     */
     private advance(): string {
         return this.source.charAt(this.current++);
     }
 
+    /**
+     * Consume the current symbol if it matches a given character, else return false.
+     * @param expected expected character
+     * @private
+     */
     private match(expected: string): boolean {
         if (this.isAtEnd()) {
             return false;
@@ -174,6 +236,10 @@ export default class Lexer {
         return true;
     }
 
+    /**
+     * Returns the current symbol.
+     * @private
+     */
     private peek(): string {
         if (this.isAtEnd()) {
             return "\0";
@@ -181,6 +247,10 @@ export default class Lexer {
         return this.source.charAt(this.current);
     }
 
+    /**
+     * Returns the symbol after the current symbol.
+     * @private
+     */
     private peekNext(): string {
         if (this.current + 1 >= this.source.length) {
             return "\0";
@@ -188,10 +258,27 @@ export default class Lexer {
         return this.source.charAt(this.current + 1);
     }
 
+    /**
+     * Push a new token to the output list.
+     *
+     * @param type token type
+     * @param literal token value
+     * @param begin start index in source
+     * @param end end index in source
+     * @param position position in source (may be different from begin)
+     * @private
+     */
     private emitToken(type: TokenType, literal: any = null, begin: number = this.start, end: number = this.current, position: number = begin) {
         this.tokens.push(new Token(type, this.source.substring(begin, end), literal, position + this.offset));
     }
 
+    /**
+     * Prints an error message to the console, then throws an error.
+     *
+     * @param message error message
+     * @param position position in source where the error occurred
+     * @private
+     */
     private errorOnPosition(message: string, position: number = this.current - 1): Error {
         Log.reportError("Syntax", this.source, message, position + this.offset);
         return Error();

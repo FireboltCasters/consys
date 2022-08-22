@@ -4,7 +4,6 @@ import Lexer from "./dsl/Lexer";
 import Parser from "./dsl/Parser";
 import Emitter from "./dsl/Emitter";
 import FunctionGenerator from "./ignoreCoverage/FunctionGenerator";
-import {Expression} from "./dsl/Expression";
 import TextProcessor from "./dsl/TextProcessor";
 
 /**
@@ -21,8 +20,6 @@ export default class Constraint<M, S> {
   private stateVarOccurrences: {[key: string]: number} = {};
   private initializedStatistics: boolean = false;
 
-  private readonly ast: Expression.AST;
-
   /**
    * Create a new constraint from constraint data.
    *
@@ -31,13 +28,20 @@ export default class Constraint<M, S> {
   constructor(resource: ConstraintData) {
     this.resource = resource;
     this.textProcessor = new TextProcessor(!!resource.message ? resource.message : "");
+    this.assertionFunction = Constraint.generateFromSource(resource.constraint);
+  }
 
-    let source = resource.constraint;
+  /**
+   * Generates a javascript function from a string of dsl source code
+   *
+   * @param source dsl source code
+   * @private
+   */
+  private static generateFromSource(source: string): Function {
     let tokens = new Lexer(source).scan();
-    this.ast = new Parser(source, tokens).parse();
-
-    let js = new Emitter(this.ast).emit();
-    this.assertionFunction = FunctionGenerator.generateFromString(js);
+    let ast = new Parser(source, tokens).parse();
+    let js = new Emitter(ast).emit();
+    return FunctionGenerator.generateFromString(js);
   }
 
   /**
