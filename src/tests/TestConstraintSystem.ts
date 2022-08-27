@@ -42,8 +42,8 @@ const constraintData = [
     id: 1,
   },
   {
-    constraint: "ALWAYS: ZERO <= LENGTH($time)",
-    message: 'failed'
+    constraint: 'ALWAYS: ZERO <= LENGTH($time)',
+    message: 'failed',
   },
   {
     constraint: "ALWAYS: $time == '5:00'",
