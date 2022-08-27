@@ -10,6 +10,7 @@ test('Lexer throws error on invalid symbols', () => {
     expect(() => lexerScanFromSource('WHEN 4 == 2: ^-^')).toThrowError();
     expect(() => lexerScanFromSource('ALWAYS : 4 & 2')).toThrowError();
     expect(() => lexerScanFromSource('ALWAYS : 4 | 2')).toThrowError();
+    expect(() => lexerScanFromSource('ALWAYS : 4 = 2')).toThrowError();
 });
 
 test('Lexer returns single eof token on empty source', () => {
