@@ -1,8 +1,15 @@
 import Token from "./Token";
 
+/**
+ * Utility class to print an ast.
+ */
 class ASTPrinter implements Expression.Visitor<string> {
 
-    print(ast: Expression.AST) {
+    /**
+     * Returns the string representation of a given ast.
+     * @param ast ast to be printed
+     */
+    print(ast: Expression.AST): string {
         return ast.root?.accept(this) || ``;
     }
 
@@ -45,14 +52,26 @@ class ASTPrinter implements Expression.Visitor<string> {
 
 export namespace Expression {
 
+    export type Statistics = {
+        counts: {
+            model: { [key: string]: number },
+            state: { [key: string]: number },
+        }
+    };
+
+    /**
+     * Represents the root node of an abstract syntax tree that was created from a given source.
+     */
     export class AST {
 
         readonly root: Expression.Expression | null;
         readonly source: string;
+        readonly statistics: Statistics;
 
-        constructor(root: Expression.Expression | null, source: string) {
+        constructor(root: Expression.Expression | null, source: string, statistics: Statistics) {
             this.root = root;
             this.source = source;
+            this.statistics = statistics;
         }
 
         toString(): string {
@@ -60,6 +79,9 @@ export namespace Expression {
         }
     }
 
+    /**
+     * Implementations of this interface can use these methods to traverse the ast.
+     */
     export interface Visitor<T> {
         visitBinaryExpression(expression: Expression.Binary): T;
         visitConstraintExpression(expression: Expression.Constraint): T;

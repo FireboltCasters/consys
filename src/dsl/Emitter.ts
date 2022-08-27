@@ -20,7 +20,15 @@ export default class Emitter implements Expression.Visitor<string> {
     visitConstraintExpression(rule: Expression.Constraint): string {
         let activation = rule.activation.accept(this);
         let assertion = rule.assertion.accept(this);
-        return `if(${activation}){return(${assertion});}else{return(true);}`;
+        let assertFn = `function assert(e,n){if(!e){throw Error(n)}};`;
+        let validInputCheck = ``;
+        for (let modelVar of Object.keys(this.ast.statistics.counts.model)) {
+            validInputCheck += `assert(this.model.${modelVar}!==undefined,"$${modelVar}");`;
+        }
+        for (let stateVar of Object.keys(this.ast.statistics.counts.state)) {
+            validInputCheck += `assert(this.state.${stateVar}!==undefined,"#${stateVar}");`;
+        }
+        return `${assertFn}${validInputCheck}if(${activation}){return(${assertion});}else{return(true);}`;
     }
 
     visitFunctionExpression(rule: Expression.Function): string {
@@ -41,10 +49,9 @@ export default class Emitter implements Expression.Visitor<string> {
                 return `'${rule.value.lexeme}'`;
             case TokenType.NUMBER:
                 return `${rule.value.lexeme}`;
-            case TokenType.ALWAYS:
+            default:
                 return `true`;
         }
-        return `this.functions['${rule.value.lexeme}'](this.model,this.state)`;
     }
 
     visitLogicalExpression(rule: Expression.Logical): string {

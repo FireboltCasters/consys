@@ -8,7 +8,7 @@ export default class Interpreter<M, S> implements Expression.Visitor<any> {
     // store the current model, state and registered functions for evaluation
     private model: M | null                                 = null;
     private state: S | null                                 = null;
-    private source: string | null                           = null;
+    private source: string                                  = "";
     private functions: {[name: string]: Function} | null    = null;
 
     interpret(ast: Expression.AST, model: M, state: S, functions: {[name: string]: Function}): any {
@@ -51,11 +51,9 @@ export default class Interpreter<M, S> implements Expression.Visitor<any> {
                 return left >= right;
             case TokenType.LESS:
                 return left < right;
-            case TokenType.LESS_EQUAL:
+            default:
                 return left <= right;
         }
-        // unreachable
-        return false;
     }
 
     visitConstraintExpression(expression: Expression.Constraint): any {
@@ -120,19 +118,20 @@ export default class Interpreter<M, S> implements Expression.Visitor<any> {
             return JSON.stringify(value);
         }
         for (let name of expression.name) {
-            try {
-                value = value[name.lexeme];
-            } catch (error) {
+            if (value[name.lexeme] === undefined) {
                 const type = expression.type.type === TokenType.HASH ? "state" : "model";
+                const variable = expression.type.type === TokenType.HASH ? this.state : this.model;
+                const fullVariableName = expression.name.map((token) => token.lexeme).join(".");
                 const position = name.position;
-                this.reportError(`Given ${type} has no attribute '${name.lexeme}'`, position);
+                this.reportError(`Attribute '${fullVariableName}' not found in ${type}: ${JSON.stringify(variable)}`, position);
                 return false;
             }
+            value = value[name.lexeme];
         }
         return value;
     }
 
     private reportError(message: string, position: number) {
-        Log.reportError("Runtime", this.source || "", message, position);
+        Log.reportError("Evaluation", this.source, message, position);
     }
 }
