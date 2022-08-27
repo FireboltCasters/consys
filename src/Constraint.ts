@@ -1,16 +1,15 @@
 import {ConstraintData, Evaluation, EvaluationData, Log} from './Util';
-import Lexer from "./dsl/Lexer";
-import Parser from "./dsl/Parser";
-import Emitter from "./dsl/Emitter";
-import FunctionGenerator from "./ignoreCoverage/FunctionGenerator";
-import TextProcessor from "./dsl/TextProcessor";
-import {Expression} from "./dsl/Expression";
+import Lexer from './dsl/Lexer';
+import Parser from './dsl/Parser';
+import Emitter from './dsl/Emitter';
+import FunctionGenerator from './ignoreCoverage/FunctionGenerator';
+import TextProcessor from './dsl/TextProcessor';
+import {Expression} from './dsl/Expression';
 
 /**
  * Represents a single constraint, with specified model and state data types.
  */
 export default class Constraint<M, S> {
-
   private readonly textProcessor: TextProcessor<M, S>;
   private readonly assertionFunction: Function;
   private readonly resource: ConstraintData;
@@ -23,7 +22,9 @@ export default class Constraint<M, S> {
    */
   constructor(resource: ConstraintData) {
     this.resource = resource;
-    this.textProcessor = new TextProcessor(!!resource.message ? resource.message : "");
+    this.textProcessor = new TextProcessor(
+      !!resource.message ? resource.message : ''
+    );
     const tokens = new Lexer(resource.constraint).scan();
     this.ast = new Parser(resource.constraint, tokens).parse();
     const js = new Emitter(this.ast).emit();
@@ -58,28 +59,39 @@ export default class Constraint<M, S> {
         message:
           consistent || !this.resource.message
             ? ''
-            : this.textProcessor.process(data.model, data.state, data.functions, rescan),
+            : this.textProcessor.process(
+                data.model,
+                data.state,
+                data.functions,
+                rescan
+              ),
         resource: this.resource,
       };
     } catch (error) {
       const errorVariable = error.message;
       const variable = errorVariable.substring(1);
-      const isModel = errorVariable.startsWith("$");
-      const type = isModel ? "model" : "state";
+      const isModel = errorVariable.startsWith('$');
+      const type = isModel ? 'model' : 'state';
       const provided = isModel ? data.model : data.state;
       const position = this.resource.constraint.indexOf(variable);
       Log.reportError(
-          "Evaluation",
-          this.resource.constraint,
-          `Attribute '${variable}' not found in ${type}: ${JSON.stringify(provided)}`,
-          position
+        'Evaluation',
+        this.resource.constraint,
+        `Attribute '${variable}' not found in ${type}: ${JSON.stringify(
+          provided
+        )}`,
+        position
       );
       return {
         consistent: false,
-        message:
-            !this.resource.message
-                ? ''
-                : this.textProcessor.process(data.model, data.state, data.functions, rescan),
+        message: !this.resource.message
+          ? ''
+          : this.textProcessor.process(
+              data.model,
+              data.state,
+              data.functions,
+              rescan
+            ),
         resource: this.resource,
       };
     }

@@ -169,8 +169,8 @@ test('ConstraintSystem behaves as expected', async () => {
         system.getMessage('Length is ADD(3, ADD(2, 1)), is it?', model, state)
       ).toBe('Length is 6, is it?');
       expect(system.getMessage('$', model, state)).toBe(JSON.stringify(model));
-      expect(system.getMessage('$unknown', model, state)).toBe("false");
-      expect(system.getMessage('$tim!e', model, state)).toBe("false!e");
+      expect(system.getMessage('$unknown', model, state)).toBe('false');
+      expect(system.getMessage('$tim!e', model, state)).toBe('false!e');
       expect(system.getMessage(',$maxLength, right?', model, state)).toBe(
         ',10, right?'
       );
