@@ -53,7 +53,6 @@ export default class ConstraintSystem<M, S> {
   async registerPlugin(plugin: ConstraintSystemPlugin<M, S>) {
     await plugin.registerFunctions(this);
     await plugin.registerConstraints(this);
-    Log.print('Registered plugin: ' + plugin.constructor.name);
   }
 
   /**

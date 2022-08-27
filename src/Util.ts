@@ -1,5 +1,3 @@
-import Config from './Config';
-
 /**
  * Evaluation data for a single constraint.
  */
@@ -118,17 +116,6 @@ export default class Util {
  * Utility log class.
  */
 export class Log {
-  /**
-   * Just like console log, but only logs if enabled.
-   *
-   * @param args arguments
-   */
-  static print(...args: any[]) {
-    if (Config.DEBUG_LOG) {
-      console.log('[consys]: ', ...args);
-    }
-  }
-
   /**
    * Throw an error.
    *

@@ -51,6 +51,14 @@ export default class Parser {
     private readonly tokens: Token[];
     private current: number = 0;
 
+    // statistics used to evaluate the generated constraint
+    private statistics: Expression.Statistics = {
+        counts: {
+            model: {},
+            state: {}
+        }
+    };
+
     /**
      * Creates a new parser instance from a given string of source code and a list of tokens.
      *
@@ -121,7 +129,7 @@ export default class Parser {
             throw this.syntaxErrorOnToken(this.peek(), emptyMessage);
         }
         const root = start();
-        return new Expression.AST(root, this.source);
+        return new Expression.AST(root, this.source, this.statistics);
     }
 
     /**
@@ -309,6 +317,7 @@ export default class Parser {
                 name.push(identifier);
             }
         }
+        this.addStatisticsVariable(type, name);
         return new Expression.Variable(type, name);
     }
 
@@ -400,6 +409,31 @@ export default class Parser {
             expression = new Expression.Binary(expression, operator, right);
         }
         return expression;
+    }
+
+    /**
+     * Adds a variable of given type (model or state) to the statistics counts.
+     *
+     * @param type variable type
+     * @param name variable name
+     * @private
+     */
+    private addStatisticsVariable(type: Token, name: Token[]) {
+        if (name.length === 0) {
+            return;
+        }
+        const identifierString = name.map((token) => token.lexeme).join(".");
+        if (type.type === TokenType.DOLLAR) {
+            if (!this.statistics.counts.model[identifierString]) {
+                this.statistics.counts.model[identifierString] = 0;
+            }
+            this.statistics.counts.model[identifierString]++;
+        } else {
+            if (!this.statistics.counts.state[identifierString]) {
+                this.statistics.counts.state[identifierString] = 0;
+            }
+            this.statistics.counts.state[identifierString]++;
+        }
     }
 
     /**
