@@ -79,14 +79,14 @@ export default class Emitter implements Expression.Visitor<string> {
     return `${operator}${expression}`;
   }
 
-    visitVariableExpression(rule: Expression.Variable): string {
-        let variable = `this.model`;
-        if (rule.prefix.type === TokenType.HASH) {
-            variable = `this.state`;
-        }
-        for (let identifier of rule.name) {
-            variable += `.${identifier.lexeme}`;
-        }
-        return variable;
+  visitVariableExpression(rule: Expression.Variable): string {
+    let variable = `this.model`;
+    if (rule.prefix.type === TokenType.HASH) {
+      variable = `this.state`;
     }
+    for (let identifier of rule.name) {
+      variable += `.${identifier.lexeme}`;
+    }
+    return variable;
+  }
 }
