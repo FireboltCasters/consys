@@ -12,7 +12,7 @@ import Util, {
   StatisticsReport,
 } from './Util';
 import Constraint from './Constraint';
-import TextProcessor from "./dsl/TextProcessor";
+import TextProcessor from './dsl/TextProcessor';
 
 /**
  * A constraint system with multiple constraints and custom functions, defined for specific model and state types.
@@ -179,7 +179,10 @@ export default class ConstraintSystem<M, S> {
     let evaluationRes = [];
     this.updateEvaluationData(model, state);
     for (let constraint of this.constraints) {
-      let evaluation = constraint.evaluate(this.evaluationData!!, this.updatedFunctions);
+      let evaluation = constraint.evaluate(
+        this.evaluationData!!,
+        this.updatedFunctions
+      );
       evaluationRes.push(evaluation);
     }
     let constraintData = this.getConstraintData();
@@ -321,7 +324,11 @@ export default class ConstraintSystem<M, S> {
    * @param state state
    */
   getMessage(msgString: string, model: M, state: S): string {
-    return new TextProcessor<M, S>(msgString).process(model, state, this.functions);
+    return new TextProcessor<M, S>(msgString).process(
+      model,
+      state,
+      this.functions
+    );
   }
 
   /**

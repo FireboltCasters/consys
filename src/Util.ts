@@ -125,10 +125,17 @@ export class Log {
     return Error('[consys]: Error: ' + msg);
   }
 
-  static reportError(what: string, where: string, message: string, position: number) {
+  static reportError(
+    what: string,
+    where: string,
+    message: string,
+    position: number
+  ) {
     const prefix = `[consys]:`;
     const heading = `${what} error in:`;
-    const whitespace = " ".repeat(position + 1);
-    console.error(`${prefix} ${heading}\n${prefix} ${where}\n${prefix}${whitespace}^~~~~~ ${message}.`);
+    const whitespace = ' '.repeat(position + 1);
+    console.error(
+      `${prefix} ${heading}\n${prefix} ${where}\n${prefix}${whitespace}^~~~~~ ${message}.`
+    );
   }
 }
