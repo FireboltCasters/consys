@@ -96,21 +96,6 @@ export default class ConstraintSystem<M, S> {
   }
 
   /**
-   * Helper function to add a custom function or statement.
-   *
-   * @param name name of the function or statement
-   * @param fun custom function or statement
-   * @private
-   */
-  private addFun(name: string, fun: Function) {
-    if (this.functions[name] !== undefined) {
-      throw Log.error('Function with name ' + name + ' is already registered');
-    }
-    this.functions[name] = fun;
-    this.updatedFunctions = true;
-  }
-
-  /**
    * Evaluates one or more models and a state given all registered constraints and functions.
    *
    * @param model model to be evaluated
@@ -131,6 +116,21 @@ export default class ConstraintSystem<M, S> {
     this.filterReportEvaluation(reports, include);
     this.updatedFunctions = false;
     return reports;
+  }
+
+  /**
+   * Helper function to add a custom function or statement.
+   *
+   * @param name name of the function or statement
+   * @param fun custom function or statement
+   * @private
+   */
+  private addFun(name: string, fun: Function) {
+    if (this.functions[name] !== undefined) {
+      throw Log.error('Function with name ' + name + ' is already registered');
+    }
+    this.functions[name] = fun;
+    this.updatedFunctions = true;
   }
 
   /**

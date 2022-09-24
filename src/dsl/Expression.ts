@@ -46,7 +46,7 @@ class ASTPrinter implements Expression.Visitor<string> {
     }
 
     visitVariableExpression(rule: Expression.Variable): string {
-        return `${rule.type.lexeme} ${rule.name.map((e) => e.lexeme).join(`.`)}`;
+        return `${rule.prefix.lexeme} ${rule.name.map((e) => e.lexeme).join(`.`)}`;
     }
 }
 
@@ -204,11 +204,11 @@ export namespace Expression {
 
     export class Variable implements Expression {
 
-        readonly type: Token;
+        readonly prefix: Token;
         readonly name: Token[];
 
-        constructor(type: Token, name: Token[]) {
-            this.type = type;
+        constructor(prefix: Token, name: Token[]) {
+            this.prefix = prefix;
             this.name = name;
         }
 
