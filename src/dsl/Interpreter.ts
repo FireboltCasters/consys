@@ -121,27 +121,36 @@ export default class Interpreter<M, S> implements Expression.Visitor<any> {
     return !right;
   }
 
-    visitVariableExpression(expression: Expression.Variable): any {
-        let value: any = this.model;
-        if (expression.prefix.type === TokenType.HASH) {
-            value = this.state;
-        }
-        if (expression.name.length === 0) {
-            return JSON.stringify(value);
-        }
-        for (let name of expression.name) {
-            if (value[name.lexeme] === undefined) {
-                const type = expression.prefix.type === TokenType.HASH ? "state" : "model";
-                const variable = expression.prefix.type === TokenType.HASH ? this.state : this.model;
-                const fullVariableName = expression.name.map((token) => token.lexeme).join(".");
-                const position = name.position;
-                this.reportError(`Attribute '${fullVariableName}' not found in ${type}: ${JSON.stringify(variable)}`, position);
-                return false;
-            }
-            value = value[name.lexeme];
-        }
-        return value;
+  visitVariableExpression(expression: Expression.Variable): any {
+    let value: any = this.model;
+    if (expression.prefix.type === TokenType.HASH) {
+      value = this.state;
     }
+    if (expression.name.length === 0) {
+      return JSON.stringify(value);
+    }
+    for (let name of expression.name) {
+      if (value[name.lexeme] === undefined) {
+        const type =
+          expression.prefix.type === TokenType.HASH ? 'state' : 'model';
+        const variable =
+          expression.prefix.type === TokenType.HASH ? this.state : this.model;
+        const fullVariableName = expression.name
+          .map(token => token.lexeme)
+          .join('.');
+        const position = name.position;
+        this.reportError(
+          `Attribute '${fullVariableName}' not found in ${type}: ${JSON.stringify(
+            variable
+          )}`,
+          position
+        );
+        return false;
+      }
+      value = value[name.lexeme];
+    }
+    return value;
+  }
 
   private reportError(message: string, position: number) {
     Log.reportError('Evaluation', this.source, message, position);
