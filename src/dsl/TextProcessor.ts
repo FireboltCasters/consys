@@ -25,8 +25,9 @@ export default class TextProcessor<M, S> {
   private current: number = 0;
   private start: number = 0;
 
-  constructor(source: string) {
+  constructor(source: string, functions: {[name: string]: Function} = {}) {
     this.source = source;
+    this.functions = functions;
     this.scan();
   }
 

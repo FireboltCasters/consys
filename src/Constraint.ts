@@ -10,7 +10,7 @@ import {Expression} from './dsl/Expression';
  * Represents a single constraint, with specified model and state data types.
  */
 export default class Constraint<M, S> {
-  private readonly textProcessor: TextProcessor<M, S>;
+  private textProcessor: TextProcessor<M, S> | undefined;
   private readonly assertionFunction: Function;
   private readonly resource: ConstraintData;
   private readonly ast: Expression.AST;
@@ -22,9 +22,6 @@ export default class Constraint<M, S> {
    */
   constructor(resource: ConstraintData) {
     this.resource = resource;
-    this.textProcessor = new TextProcessor(
-      !!resource.message ? resource.message : ''
-    );
     const tokens = new Lexer(resource.constraint).scan();
     this.ast = new Parser(resource.constraint, tokens).parse();
     const js = new Emitter(this.ast).emit();
@@ -52,8 +49,14 @@ export default class Constraint<M, S> {
    * @param rescan determine if the text processor should rescan if something has changed
    */
   evaluate(data: EvaluationData<M, S>, rescan: boolean): Evaluation {
+    if (!this.textProcessor) {
+      this.textProcessor = new TextProcessor(
+          !!this.resource.message ? this.resource.message : '',
+          data.functions
+      );
+    }
     try {
-      let consistent = this.isConsistent(data);
+      const consistent = this.isConsistent(data);
       return {
         consistent: consistent,
         message:
