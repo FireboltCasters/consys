@@ -51,8 +51,8 @@ export default class Constraint<M, S> {
   evaluate(data: EvaluationData<M, S>, rescan: boolean): Evaluation {
     if (!this.textProcessor) {
       this.textProcessor = new TextProcessor(
-          !!this.resource.message ? this.resource.message : '',
-          data.functions
+        !!this.resource.message ? this.resource.message : '',
+        data.functions
       );
     }
     try {
