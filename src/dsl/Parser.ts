@@ -6,7 +6,7 @@ import {Log} from '../Util';
  * This class transforms a given list of tokens into an abstract syntax tree mirroring the dsl grammar.
  * Syntax definition for constraints:
  *
- * constraint      ->  activation ":" assertion ;
+ * constraint      ->  activation ( ":" | "THEN" ) assertion ;
  * activation      ->  "ALWAYS" | "WHEN" expression | functionExpr ;
  * assertion       ->  expression ;
  *
@@ -141,7 +141,7 @@ export default class Parser {
    */
   private constraint(): Expression.Expression {
     let activation = this.activation();
-    this.consume(TokenType.COLON, "Expected ':' after activation");
+    this.consumeAny("Expected ':' or 'THEN' after activation", TokenType.COLON, TokenType.THEN);
     let assertion = this.assertion();
     if (!this.isAtEnd()) {
       let token = this.peek();
@@ -484,6 +484,22 @@ export default class Parser {
   private consume(type: TokenType, message: string): Token {
     if (this.check(type)) {
       return this.advance();
+    }
+    throw this.syntaxErrorOnToken(this.peek(), message);
+  }
+
+  /**
+   * Consumes the current token if it matches any of the given token types.
+   *
+   * @param message error message if current token is not of any given type
+   * @param types token types
+   * @private
+   */
+  private consumeAny(message: string, ...types: TokenType[]): Token {
+    for (const type of types) {
+      if (this.check(type)) {
+        return this.advance();
+      }
     }
     throw this.syntaxErrorOnToken(this.peek(), message);
   }

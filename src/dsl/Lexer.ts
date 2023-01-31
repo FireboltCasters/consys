@@ -25,6 +25,7 @@ export default class Lexer {
   private static readonly keywords: {[key: string]: TokenType} = {
     ALWAYS: TokenType.ALWAYS,
     WHEN: TokenType.WHEN,
+    THEN: TokenType.THEN,
     AND: TokenType.AND,
     OR: TokenType.OR,
     NOT: TokenType.NOT,

@@ -68,7 +68,7 @@ test('Constraint throws error when called with invalid arguments', () => {
     ).consistent
   ).toBe(false);
   constraint = new Constraint({
-    constraint: 'WHEN $x > $y: $y * $y == #z',
+    constraint: 'WHEN $x > $y THEN $y * $y == #z',
   });
   expect(
     constraint.evaluate(

@@ -35,6 +35,7 @@ export enum TokenType {
   // keywords
   ALWAYS,
   WHEN,
+  THEN,
   AND,
   OR,
   NOT,
