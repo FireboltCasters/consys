@@ -215,10 +215,8 @@ export default class Lexer {
     while (Lexer.isAlphaNumeric(this.peek())) {
       this.advance();
     }
-    let identifier = this.source
-      .substring(this.start, this.current)
-      .toUpperCase();
-    let type = Lexer.keywords[identifier];
+    let identifier = this.source.substring(this.start, this.current);
+    let type = Lexer.keywords[identifier.toUpperCase()];
     if (!type) {
       type = TokenType.IDENTIFIER;
     }
