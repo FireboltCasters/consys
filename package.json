@@ -1,6 +1,6 @@
 {
   "name": "consys",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "consys is a flexible tool to evaluate models using generic and readable constraints.",
   "main": "index.js",
   "types": "index.d.ts",
