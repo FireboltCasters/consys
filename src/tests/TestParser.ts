@@ -58,7 +58,9 @@ test('Parser does not throw error from valid syntax', () => {
   expect(!!parseFromSource('ALWAYS : A <= $B - #C || D').root).toBe(true);
   expect(!!parseFromSource('ALWAYS : A == $B * #C OR D AND E').root).toBe(true);
   expect(!!parseFromSource('ALWAYS : A != $B / #C OR D && E').root).toBe(true);
-  expect(!!parseFromSource('ALWAYS THEN A != $B / #C OR D && E').root).toBe(true);
+  expect(!!parseFromSource('ALWAYS THEN A != $B / #C OR D && E').root).toBe(
+    true
+  );
   expect(
     !!parseFromSource('ALWAYS : A >= $B / #C OR D && E % F > G').root
   ).toBe(true);

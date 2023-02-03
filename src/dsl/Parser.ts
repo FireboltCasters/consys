@@ -141,7 +141,11 @@ export default class Parser {
    */
   private constraint(): Expression.Expression {
     let activation = this.activation();
-    this.consumeAny("Expected ':' or 'THEN' after activation", TokenType.COLON, TokenType.THEN);
+    this.consumeAny(
+      "Expected ':' or 'THEN' after activation",
+      TokenType.COLON,
+      TokenType.THEN
+    );
     let assertion = this.assertion();
     if (!this.isAtEnd()) {
       let token = this.peek();
