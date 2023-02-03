@@ -17,7 +17,7 @@ export default class Lexer {
     '/': TokenType.SLASH,
     '*': TokenType.STAR,
     '%': TokenType.PERCENT,
-    '$': TokenType.DOLLAR,
+    $: TokenType.DOLLAR,
     '#': TokenType.HASH,
   };
 
