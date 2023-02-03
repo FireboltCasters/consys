@@ -26,6 +26,7 @@ test('Interpreter returns nothing with no valid ast', () => {
 
 test('Interpreter returns correct result for trivial expressions', () => {
   expect(interpretFromSource('WHEN 4 < 2: 4 + 4 * 2')).toBe(true);
+  expect(interpretFromSource('IF 4 < 2 THEN 4 + 4 * 2')).toBe(true);
   expect(interpretFromSource('ALWAYS: 4 + 4 * 2')).toBe(12);
   expect(interpretFromSource('ALWAYS: 42 > 42 AND 42')).toBe(false);
   expect(interpretFromSource('ALWAYS: 42 >= 42 OR 42')).toBe(true);

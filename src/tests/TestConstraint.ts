@@ -15,7 +15,7 @@ test('Constraint has correct statistics', () => {
 
 test('Constraint evaluates self and message as expected with true constraint', () => {
   const resource = {
-    constraint: 'WHEN $x > $y: $y * $y == #z',
+    constraint: 'IF $x > $y THEN $y * $y == #z',
     message: 'x is $x and y is $y and z is #z',
   };
   const constraint = new Constraint<Model, State>(resource);

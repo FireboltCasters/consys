@@ -7,7 +7,7 @@ import {Log} from '../Util';
  * Syntax definition for constraints:
  *
  * constraint      ->  activation ( ":" | "THEN" ) assertion ;
- * activation      ->  "ALWAYS" | "WHEN" expression | functionExpr ;
+ * activation      ->  "ALWAYS" | "WHEN" | "IF" expression | functionExpr ;
  * assertion       ->  expression ;
  *
  * expression      ->  disjunction ;
@@ -136,7 +136,7 @@ export default class Parser {
 
   /**
    * Matches this rule:
-   * constraint      ->  activation ":" assertion ;
+   * constraint      ->  activation ( ":" | "THEN" ) assertion ;
    * @private
    */
   private constraint(): Expression.Expression {
@@ -156,11 +156,11 @@ export default class Parser {
 
   /**
    * Matches this rule:
-   * activation      ->  "ALWAYS" | "WHEN" expression | functionExpr ;
+   * activation      ->  "ALWAYS" | "WHEN" | "IF" expression | functionExpr ;
    * @private
    */
   private activation(): Expression.Expression {
-    if (this.matchAny(TokenType.ALWAYS, TokenType.WHEN)) {
+    if (this.matchAny(TokenType.ALWAYS, TokenType.WHEN, TokenType.IF)) {
       let operator = this.previous();
       if (operator.type === TokenType.ALWAYS) {
         return new Expression.Literal(operator);

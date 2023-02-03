@@ -17,7 +17,7 @@ export default class Lexer {
     '/': TokenType.SLASH,
     '*': TokenType.STAR,
     '%': TokenType.PERCENT,
-    $: TokenType.DOLLAR,
+    '$': TokenType.DOLLAR,
     '#': TokenType.HASH,
   };
 
@@ -26,6 +26,7 @@ export default class Lexer {
     ALWAYS: TokenType.ALWAYS,
     WHEN: TokenType.WHEN,
     THEN: TokenType.THEN,
+    IF: TokenType.IF,
     AND: TokenType.AND,
     OR: TokenType.OR,
     NOT: TokenType.NOT,

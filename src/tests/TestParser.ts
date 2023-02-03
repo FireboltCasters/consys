@@ -39,6 +39,7 @@ test('Parser throws error on unexpected tokens', () => {
   expect(() => parseFromSource('ALWAYS : #a$b')).toThrowError();
   expect(() => parseFromSource('ALWAYS THEN #a$b')).toThrowError();
   expect(() => parseFromSource('WHEN #a#b : 1 < 3')).toThrowError();
+  expect(() => parseFromSource('IF #a#b : 1 < 3')).toThrowError();
   expect(() => parseFromSource('ALWAYS : 1 <> 3')).toThrowError();
   expect(() => parseFromSource('ALWAYS : 1 < 3 <')).toThrowError();
   expect(() => parseFromSource('ALWAYS : 1 <')).toThrowError();
@@ -50,6 +51,7 @@ test('Parser does not throw error from valid syntax', () => {
   expect(!!parseFromSource('ALWAYS THEN TRUE').root).toBe(true);
   expect(!!parseFromSource('WHEN TRUE : TRUE').root).toBe(true);
   expect(!!parseFromSource('WHEN TRUE THEN TRUE').root).toBe(true);
+  expect(!!parseFromSource('IF TRUE THEN TRUE').root).toBe(true);
   expect(!!parseFromSource('TRUE : TRUE').root).toBe(true);
   expect(!!parseFromSource('ALWAYS : A < $B + #C').root).toBe(true);
   expect(!!parseFromSource('ALWAYS THEN A < $B + #C').root).toBe(true);

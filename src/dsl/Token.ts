@@ -36,6 +36,7 @@ export enum TokenType {
   ALWAYS,
   WHEN,
   THEN,
+  IF,
   AND,
   OR,
   NOT,
