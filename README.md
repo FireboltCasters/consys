@@ -13,21 +13,6 @@
   <a href="https://github.com/marketplace/actions/lint-action"><img src="https://img.shields.io/badge/uses-Lint%20Action-blue.svg"/></a>
 </p>
 
-<p align="left">
-  <a href="https://github.com/FireboltCasters/consys/actions/workflows/npmPublish.yml"><img src="https://github.com/FireboltCasters/consys/actions/workflows/npmPublish.yml/badge.svg" alt="Npm publish" /></a>
-  <a href="https://github.com/FireboltCasters/consys/actions/workflows/linter.yml"><img src="https://github.com/FireboltCasters/consys/actions/workflows/linter.yml/badge.svg" alt="Build status" /></a>
-  <a href="https://sonarcloud.io/dashboard?id=FireboltCasters_consys"><img src="https://sonarcloud.io/api/project_badges/measure?project=FireboltCasters_consys&metric=alert_status" alt="Quality Gate" /></a>
-  <a href="https://sonarcloud.io/dashboard?id=FireboltCasters_consys"><img src="https://sonarcloud.io/api/project_badges/measure?project=FireboltCasters_consys&metric=bugs" alt="Bugs" /></a>
-  <a href="https://sonarcloud.io/dashboard?id=FireboltCasters_consys"><img src="https://sonarcloud.io/api/project_badges/measure?project=FireboltCasters_consys&metric=coverage" alt="Coverage" /></a>
-  <a href="https://sonarcloud.io/dashboard?id=FireboltCasters_consys"><img src="https://sonarcloud.io/api/project_badges/measure?project=FireboltCasters_consys&metric=code_smells" alt="Code Smells" /></a>
-  <a href="https://sonarcloud.io/dashboard?id=FireboltCasters_consys"><img src="https://sonarcloud.io/api/project_badges/measure?project=FireboltCasters_consys&metric=duplicated_lines_density" alt="Duplicated Lines (%)" /></a>
-  <a href="https://sonarcloud.io/dashboard?id=FireboltCasters_consys"><img src="https://sonarcloud.io/api/project_badges/measure?project=FireboltCasters_consys&metric=sqale_rating" alt="Maintainability Rating" /></a>
-  <a href="https://sonarcloud.io/dashboard?id=FireboltCasters_consys"><img src="https://sonarcloud.io/api/project_badges/measure?project=FireboltCasters_consys&metric=reliability_rating" alt="Reliability Rating" /></a>
-  <a href="https://sonarcloud.io/dashboard?id=FireboltCasters_consys"><img src="https://sonarcloud.io/api/project_badges/measure?project=FireboltCasters_consys&metric=security_rating" alt="Security Rating" /></a>
-  <a href="https://sonarcloud.io/dashboard?id=FireboltCasters_consys"><img src="https://sonarcloud.io/api/project_badges/measure?project=FireboltCasters_consys&metric=sqale_index" alt="Technical Debt" /></a>
-  <a href="https://sonarcloud.io/dashboard?id=FireboltCasters_consys"><img src="https://sonarcloud.io/api/project_badges/measure?project=FireboltCasters_consys&metric=vulnerabilities" alt="Vulnerabilities" /></a>
-</p>
-
 **consys** is a flexible tool to evaluate models using generic and readable constraints.
 
 - **Modern & Lightweight:** consys has full TypeScript support and uses no additional dependencies, so it can easily be integrated.
